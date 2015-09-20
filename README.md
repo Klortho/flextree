@@ -4,9 +4,15 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 # Compiling and running
 
 ```
+mvn exec:java
+```
+
+
+```
 mvn package
 java -cp target/flextree-1.0-SNAPSHOT.jar org.klortho.flextree.Tester
 ```
+
 
 
 # To do
