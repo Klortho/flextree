@@ -1,4 +1,4 @@
-package treelayout;
+package org.klortho.flextree;
 
 import java.util.Arrays;
 

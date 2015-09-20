@@ -1,1 +1,1 @@
-java -cp build/classes treelayout.Tester
+java -cp build/classes org.klortho.flextree.Tester

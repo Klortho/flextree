@@ -1,4 +1,4 @@
-package treelayout;
+package org.klortho.flextree;
 
 import static java.lang.Math.max;
 

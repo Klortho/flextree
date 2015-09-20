@@ -1,6 +1,6 @@
-package treelayout;
+package org.klortho.flextree;
 
-import treelayout.Paper.Tree;
+import org.klortho.flextree.Paper.Tree;
 
 public class Marshall {
 
