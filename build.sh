@@ -1,2 +1,2 @@
-javac -sourcepath src -d build/classes src/org/klortho/flextree/Measure.java
-javac -sourcepath src -d build/classes src/org/klortho/flextree/Tester.java
+javac -sourcepath src/main/java -d build/classes src/main/java/org/klortho/flextree/Measure.java
+javac -sourcepath src/main/java -d build/classes src/main/java/org/klortho/flextree/Tester.java
