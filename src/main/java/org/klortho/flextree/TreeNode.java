@@ -1,20 +1,29 @@
 package org.klortho.flextree;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
+@JsonIgnoreProperties({ "boundingBox", "minX", "depth" })
 public final class TreeNode {
-
-    // input
     public double width, height;
+    public double x, y;
     public Vector<TreeNode> children;
 
-    // output
-    public double x, y;
+    public static ObjectMapper json_mapper;
+    static {
+        json_mapper = new ObjectMapper();
+        json_mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
 
     public TreeNode() {
         this.width = 1.0;
@@ -29,6 +38,13 @@ public final class TreeNode {
         this.height = height;
         this.children = new Vector<TreeNode>();
         this.children.addAll(Arrays.asList(children));
+    }
+
+    // Create a tree from a JSON file
+    public static TreeNode fromJson(File json) 
+      throws IOException
+    {
+        return json_mapper.readValue(json, TreeNode.class);
     }
     
     public BoundingBox getBoundingBox(){
@@ -143,45 +159,10 @@ public final class TreeNode {
     }
 
 
-    public void print() {
-        System.out.printf("new TreeNode(%f, %f %f, %f ", x, y, width, height);
-        for (TreeNode child : children) {
-            System.out.printf(", ");
-            child.print();
-        }
-        System.out.printf(")");        
-    }
-    
-    public void printJson(PrintStream out) {
-        printJson(out, 0);
+    public String toJson() 
+      throws JsonProcessingException
+    {
+        return json_mapper.writeValueAsString(this);
     }
 
-    public void printJson(PrintStream out, int indent) {
-        String indentString = "";
-        for (int i = 0; i < indent; ++i) {
-            indentString += "  ";
-        }
-        out.print(
-            indentString + "{\n" +
-            indentString + "  \"width\": " + width + ",\n" +
-            indentString + "  \"height\": " + height + ",\n" +
-            indentString + "  \"x\": " + x + ",\n" +
-            indentString + "  \"y\": " + y);
-        if (children.size() > 0) {
-            out.print(",\n" + 
-                indentString + "  \"children\": [\n");
-            for (int i = 0; i < children.size(); ++i) {
-                children.get(i).printJson(out, indent + 2);
-                if (i != children.size() - 1) {
-                    out.print(",");
-                }
-                out.print("\n");
-            }
-            out.print(indentString + "  ]\n");
-        }
-        else {
-            out.print("\n");
-        }
-        out.print(indentString + "}");
-    }
 }

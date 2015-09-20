@@ -3,6 +3,11 @@ package org.klortho.flextree;
 import java.io.PrintStream;
 import java.util.Arrays;
 
+/**
+ * This program generates a large random tree, prints it out to before.json.
+ * It then runs it through the layout, and prints the results to after.json.
+ * Twiddle the SEED, otherwise you'll get the same tree every time.
+ */
 public class Tester {
 
     public static long SEED = 46;
@@ -14,7 +19,7 @@ public class Tester {
 
         try {
             PrintStream before = new PrintStream("before.json");
-            tree.printJson(before, 0);
+            before.print(tree.toJson());
             before.close();
         }
         catch(Exception e) {}
@@ -26,7 +31,7 @@ public class Tester {
 
         try {
             PrintStream after = new PrintStream("after.json");
-            tree.printJson(after, 0);
+            after.print(tree.toJson());
             after.close();
         }
         catch(Exception e) {}

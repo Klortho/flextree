@@ -42,41 +42,26 @@ public class FlextreeTest
      */
     public void testApp()
     {
-        // I want to replace the following with something that reads
-        // JSON and initializes the TreeNode from that.
-        long SEED = 46;
-        GenerateTrees gen = new GenerateTrees(200, 1, 10, 1, 10, SEED);
-        TreeNode tree = gen.rand();
-        try {
-            PrintStream before = new PrintStream("before.json");
-            tree.printJson(before, 0);
-            before.close();
-        }
-        catch(Exception e) {}
-
+        TreeNode tree;
         try {
             ObjectMapper mapper = new ObjectMapper();
             ClassLoader classLoader = getClass().getClassLoader();
             File before = new File(classLoader.getResource("before-1.json").getFile());
-            ObjectNode root = (ObjectNode) mapper.readTree(before);
-        }
-        catch(Exception e) {
-            fail(e.getMessage());
-        }
 
+            tree = mapper.readValue(before, TreeNode.class);
 
+            Marshall m = new Marshall();
+            Object converted = m.convert(tree);
+            m.runOnConverted(converted);
+            m.convertBack(converted, tree);
 
-        Marshall m = new Marshall();
-        Object converted = m.convert(tree);
-        m.runOnConverted(converted);
-        m.convertBack(converted, tree);
-
-        try {
             PrintStream after = new PrintStream("after.json");
             tree.printJson(after, 0);
             after.close();
         }
-        catch(Exception e) {}
+        catch(Exception e) {
+            fail(e.getMessage());
+        }
 
         assertTrue( true );
     }
