@@ -12,10 +12,9 @@ public class Measure {
     
     static long timeLayout(TreeNode tree){
         System.gc();
-        Marshall m = new Marshall();
-        Object converted = m.convert(tree);
+        Object converted = LayoutEngine.convert(tree);
         long start = System.nanoTime();
-        m.runOnConverted(converted);
+        LayoutEngine.runOnConverted(converted);
         long now = System.nanoTime();
         return now - start;
     }

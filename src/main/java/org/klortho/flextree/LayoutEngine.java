@@ -8,7 +8,7 @@ package org.klortho.flextree;
  * appreciated!
  */
 
-public class Paper {
+public class LayoutEngine {
     public static class Tree {
         double w, h;          // Width and height.}^
         double x, y, prelim, mod, shift, change;
@@ -27,7 +27,29 @@ public class Paper {
         firstWalk(t); 
         secondWalk(t, 0); 
     }
-       
+
+    public static Object convert(TreeNode root) {
+        if (root == null) return null;
+        Tree[] children = new Tree[root.children.size()];
+        for (int i = 0 ; i < children.length ; i++) {
+            children[i] = (Tree) convert(root.children.get(i));
+        }
+        return new Tree(root.width, root.height, root.y, children);
+    }
+
+    public static void convertBack(Object converted, TreeNode root) {
+        Tree conv = (Tree) converted;
+        root.x = conv.x;
+        for (int i = 0 ; i < conv.c.length ; i++) {
+            convertBack(conv.c[i], root.children.get(i));
+        }
+    }
+
+    public static void runOnConverted(Object root) {
+        layout((Tree) root);
+    }
+
+
     static  void firstWalk(Tree t) {
         if (t.cs == 0) { 
             setExtremes(t); return;

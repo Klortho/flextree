@@ -23,10 +23,9 @@ public class Tester {
             before.print(tree.toJson());
             before.close();
 
-            Marshall m = new Marshall();
-            Object converted = m.convert(tree);
-            m.runOnConverted(converted);
-            m.convertBack(converted, tree);
+            Object converted = LayoutEngine.convert(tree);
+            LayoutEngine.runOnConverted(converted);
+            LayoutEngine.convertBack(converted, tree);
 
             PrintStream after = new PrintStream("after.json");
             after.print(tree.toJson());

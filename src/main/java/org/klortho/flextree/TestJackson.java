@@ -15,10 +15,9 @@ public class TestJackson {
             File tree_json = new File("tree.json");
             TreeNode tree = TreeNode.fromJson(tree_json);
 
-            Marshall m = new Marshall();
-            Object converted = m.convert(tree);
-            m.runOnConverted(converted);
-            m.convertBack(converted, tree);
+            Object converted = LayoutEngine.convert(tree);
+            LayoutEngine.runOnConverted(converted);
+            LayoutEngine.convertBack(converted, tree);
 
             PrintStream after = new PrintStream("tree-after.json");
             after.print(tree.toJson());

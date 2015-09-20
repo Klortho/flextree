@@ -6,34 +6,23 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 ```
 mvn compile
 mvn exec:java
+mvn test
 ```
 
-
-```
-mvn package
-java -cp target/flextree-1.0-SNAPSHOT.jar org.klortho.flextree.Tester
-```
 
 
 
 # To do
 
-* Generate a unit test that checks the five test cases
-    * Need to be able to read a tree from json
 
 
-
-
-
-    
 
 * To do to the Java code, before porting
-    * [c] Get rid of hgap, vgap, addGap, etc.
-    * The y coordinate should be computed as part of the layout
-    * Change the name of the Paper class to Layout
-    * Merge Marshall -> Paper (Layout)
+    * [c] Change the name of the Paper class to LayoutEngine
+    * [c] Merge Marshall -> Paper (LayoutEngine)
     * Change Marshall's convert method into "wrap", inside Paper (Layout). It should
       be called by the layout() method.
+    * The y coordinate should be computed as part of the layout
 
 # Porting to JavaScript
 
