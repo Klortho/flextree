@@ -167,4 +167,36 @@ public final class TreeNode {
     public void addKid(TreeNode t){
         children.add(t);
     }
+
+
+    public void printJson(int indent) {
+        String indentString = "";
+        for (int i = 0; i < indent; ++i) {
+            indentString += "  ";
+        }
+        System.out.print(
+            indentString + "{\n" +
+            indentString + "  \"width\": " + width + ",\n" +
+            indentString + "  \"height\": " + height + ",\n" +
+            //indentString + "  \"hgap\": " + hgap + ",\n" +
+            //indentString + "  \"vgap\": " + vgap + ",\n" + 
+            indentString + "  \"x\": " + x + ",\n" +
+            indentString + "  \"y\": " + y);
+        if (children.size() > 0) {
+            System.out.print(",\n" + 
+                indentString + "  \"children\": [\n");
+            for (int i = 0; i < children.size(); ++i) {
+                children.get(i).printJson(indent + 2);
+                if (i != children.size() - 1) {
+                    System.out.print(",");
+                }
+                System.out.print("\n");
+            }
+            System.out.print(indentString + "  ]\n");
+        }
+        else {
+            System.out.print("\n");
+        }
+        System.out.print(indentString + "}");
+    }
 }

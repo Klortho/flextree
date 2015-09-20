@@ -15,10 +15,14 @@ public class Tester {
         GenerateTrees gen = new GenerateTrees(200, 1, 10, 1, 10, SEED);
 
         TreeNode tree = gen.rand();
+        System.out.println("Before:");
+        tree.printJson(0);
         Marshall m = new Marshall();
         Object converted = m.convert(tree);
         m.runOnConverted(converted);
-        System.out.printf("done\n");
+        m.convertBack(converted, tree);
+
+        System.out.println("\n\nAfter:");
+        tree.printJson(0);
     }
-    
 }

@@ -10,6 +10,28 @@ javac -sourcepath src -d build/classes src/treelayout/measure/Measure.java
 java -cp build/classes treelayout.measure.Measure
 ```
 
+# Porting to JavaScript
+
+* Figure out how Measure works
+    * Creates a GenerateTrees object
+    * The GenerateTrees object generates random trees
+    * I think that Marshall does the wrapping, and calls the layout algorithm.
+
+* Need to create some test cases, with data in a format that can be reused for
+  both Java and JavaScript.
+
+
+
+
+* To do to the Java code:
+    * The y coordinate should be computed as part of the layout
+    * Change the name of the Paper class to Layout
+    * Merge Marshall -> Paper (Layout)
+    * Change Marshall's convert method into "wrap", inside Paper (Layout). It should
+      be called by the layout() method.
+
+
+
 
 # SWT application
 
