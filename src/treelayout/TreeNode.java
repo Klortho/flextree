@@ -12,10 +12,11 @@ public final class TreeNode {
 	public double width, height;
 	public Vector<TreeNode> children;
 	public double hgap, vgap;
+
 	// output
-	public double x,y;
+	public double x, y;
 	
-	public TreeNode(double width, double height, TreeNode ... children){
+	public TreeNode(double width, double height, TreeNode ... children) {
 		this.width = width;
 		this.height = height;
 		this.children = new Vector<TreeNode>();
@@ -122,52 +123,15 @@ public final class TreeNode {
 		}
 	}
 	
-	public void print(){
-		System.out.printf("new TreeNode(%f,%f %f,%f ",x,y,width,height);
-		for(TreeNode child : children){
+	public void print() {
+		System.out.printf("new TreeNode(%f,%f %f,%f ", x, y, width, height);
+		for (TreeNode child : children){
 			System.out.printf(", ");
 			child.print();
 		}
 		System.out.printf(")");
 		
 	}
-	/*
-	public void tikzPrint(){
-		System.out.printf("\\draw (%f,%f) rectangle (%f,%f);\n",x+hgap/2.0,-y-vgap/2.0,x+width-hgap/2.0, -y - height+vgap/2.0);
-		
-		double yMid = -y - height ;
-		if(children.length != 0){
-			double l = children[0].x + children[0].width/2.0;
-			int ln = children.length-1;
-			double r = children[ln].x + children[ln].width/2.0;
-			System.out.printf("\\draw [-] (%f,%f) -- (%f,%f);\n",l,yMid, r,yMid);
-			double rx = x + width/2.0;
-			System.out.printf("\\draw [-] (%f,%f) -- (%f,%f);\n",rx,- y - height + vgap/2.0, rx,yMid);
-		}
-		for(TreeNode child : children){
-			double xMid = child.x + child.width/2.0;
-			double yTop = -(y + height);
-			double yBot = yTop - vgap/2.0;
-			System.out.printf("\\draw [-] (%f,%f) -- (%f,%f);\n",xMid,yTop, xMid,yBot);
-			child.tikzPrint();
-		}
-	}
-	
-	public void tikzDashed(){
-		System.out.printf("\\draw[style=dashed,color=gray] (%f,%f) -- (%f,%f);\n",x, -y,x,-y -height);
-		for(TreeNode child : children){
-			child.tikzDashed();
-		}
-		int ln = children.length-1;
-		if(children.length != 0){
-			System.out.printf("\\draw[style=dashed,color=gray] (%f,%f) -- (%f,%f);\n",children[0].x, -y - height,children[ln].x + children[ln].width, -y - height);
-			System.out.printf("\\draw[style=dashed,color=gray] (%f,%f) -- (%f,%f);\n",children[ln].x + children[ln].width, -children[ln].y,children[ln].x + children[ln].width,-children[ln].y - children[ln].height);
-		} else {
-			System.out.printf("\\draw[style=dashed,color=gray] (%f,%f) -- (%f,%f);\n",x, -y - height,x + width, -y - height);
-		}
-		
-	}
-	*/
 	
 	public void mul(double w, double h){
 		width *= w;
@@ -189,13 +153,14 @@ public final class TreeNode {
 		}
 	}
 	
-	public void randExpand( TreeNode t,Random r){
-		t.y+=height;
+	public void randExpand(TreeNode t, Random r) {
+		t.y += height;
 		int i = r.nextInt(children.size() + 1);
-		if(i == children.size()){
+		if (i == children.size()) {
 			addKid(t);
-		} else {
-			children.get(i).randExpand( t, r);
+		} 
+		else {
+			children.get(i).randExpand(t, r);
 		}
 	}
 	
