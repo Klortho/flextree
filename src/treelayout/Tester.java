@@ -3,11 +3,6 @@ package treelayout;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-import treelayout.GenerateTrees;
-import treelayout.TreeNode;
-
-import treelayout.algorithm.Marshall;
-
 public class Tester {
 
     public static long SEED = 46;

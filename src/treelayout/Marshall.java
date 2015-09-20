@@ -1,7 +1,6 @@
-package treelayout.algorithm;
+package treelayout;
 
-import treelayout.TreeNode;
-import treelayout.algorithm.Paper.Tree;
+import treelayout.Paper.Tree;
 
 public class Marshall {
 

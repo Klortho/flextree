@@ -1,4 +1,4 @@
-package treelayout.algorithm;
+package treelayout;
 
 /* The extended Reingold-Tilford algorithm as described in the paper
  * "Drawing Non-layered Tidy Trees in Linear Time" by Atze van der Ploeg

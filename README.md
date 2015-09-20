@@ -10,28 +10,37 @@ javac -sourcepath src -d build/classes src/treelayout/measure/Measure.java
 java -cp build/classes treelayout.measure.Measure
 ```
 
-# Porting to JavaScript
-
 * Figure out how Measure works
     * Creates a GenerateTrees object
     * The GenerateTrees object generates random trees
     * I think that Marshall does the wrapping, and calls the layout algorithm.
 
-* Need to create some test cases, with data in a format that can be reused for
+* [c] Need to create some test cases, with data in a format that can be reused for
   both Java and JavaScript.
     * Generate five random trees, and save them into the repo, along with
       results. These are my test cases, to make sure I don't break anything.
 
+* Mavenize
+    * Change package names to org.klortho.flextree
 
 
 
 
-* To do to the Java code:
+* Generate a unit test that checks the five test cases
+    * Need to be able to read a tree from json
+
+
+
+
+* To do to the Java code, before porting
+    * Get rid of hgap, vgap, addGap, etc.
     * The y coordinate should be computed as part of the layout
     * Change the name of the Paper class to Layout
     * Merge Marshall -> Paper (Layout)
     * Change Marshall's convert method into "wrap", inside Paper (Layout). It should
       be called by the layout() method.
+
+# Porting to JavaScript
 
 
 

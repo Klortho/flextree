@@ -2,11 +2,6 @@ package treelayout;
 
 import java.util.Arrays;
 
-import treelayout.GenerateTrees;
-import treelayout.TreeNode;
-
-import treelayout.algorithm.Marshall;
-
 public class Measure {
 
     public static int MAX_SIZE = 10000;

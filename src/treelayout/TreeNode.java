@@ -12,7 +12,6 @@ public final class TreeNode {
     // input
     public double width, height;
     public Vector<TreeNode> children;
-    public double hgap, vgap;
 
     // output
     public double x, y;
@@ -73,11 +72,13 @@ public final class TreeNode {
     final static double tolerance = 0.0;
     
     private boolean overlap(double xStart, double xEnd, double xStart2, double xEnd2){
-        return (xStart2 + tolerance < xEnd - tolerance  && xEnd2 - tolerance > xStart + tolerance) ||
-                 (xStart + tolerance < xEnd2 - tolerance && xEnd - tolerance > xStart2 + tolerance);
+        return ( xStart2 + tolerance < xEnd - tolerance  && 
+                 xEnd2 - tolerance > xStart + tolerance ) ||
+               ( xStart + tolerance < xEnd2 - tolerance && 
+                 xEnd - tolerance > xStart2 + tolerance );
     }
-    
-    public boolean overlapsWith(TreeNode other){
+
+    public boolean overlapsWith(TreeNode other) {
         return overlap(x, x + width, other.x , other.x + other.width)
                 && overlap(y, y + height, other.y, other.y + other.height);
         
@@ -85,27 +86,17 @@ public final class TreeNode {
     
     public void allNodes(ArrayList<TreeNode> nodes) {
         nodes.add(this);
-        for(TreeNode node : children){
+        for (TreeNode node : children) {
             node.allNodes(nodes);
         }
     }
     
-    public int getDepth(){
+    public int getDepth() {
         int res = 1;
-        for(TreeNode child : children){
+        for (TreeNode child : children){
             res = Math.max(res, child.getDepth() + 1);
         }
         return res;
-    }
-    
-    public void addGap(double hgap,double vgap){
-        this.hgap += hgap;
-        this.vgap += vgap;
-        this.width+=2*hgap;
-        this.height+=2*vgap;
-        for(TreeNode child : children){
-            child.addGap(hgap,vgap);
-        }
     }
     
     public void addSize(double hsize,double vsize){
@@ -116,40 +107,14 @@ public final class TreeNode {
         }
     }
     
-    public void addGapPerDepth(int gapPerDepth, int depth,int maxDepth){
-        this.hgap += (maxDepth-depth)*gapPerDepth;
-        this.width+=2* (maxDepth-depth)*gapPerDepth;
-        for(TreeNode child : children){
-            child.addGapPerDepth(gapPerDepth,depth+1,maxDepth);
-        }
-    }
-    
-    public void print() {
-        System.out.printf("new TreeNode(%f,%f %f,%f ", x, y, width, height);
-        for (TreeNode child : children){
-            System.out.printf(", ");
-            child.print();
-        }
-        System.out.printf(")");
-        
-    }
-    
-    public void mul(double w, double h){
-        width *= w;
-        height *= h;
-        for(TreeNode child : children){
-            child.mul(w, h);
-        }
-    }
-    
     public void layer() {
         layer(0);
     }
     
-    public void layer(double d){
+    public void layer(double d) {
         y = d;
-        d+=height;
-        for(TreeNode child : children){
+        d += height;
+        for (TreeNode child : children) {
             child.layer(d);
         }
     }
@@ -170,6 +135,15 @@ public final class TreeNode {
     }
 
 
+    public void print() {
+        System.out.printf("new TreeNode(%f, %f %f, %f ", x, y, width, height);
+        for (TreeNode child : children) {
+            System.out.printf(", ");
+            child.print();
+        }
+        System.out.printf(")");        
+    }
+    
     public void printJson(PrintStream out, int indent) {
         String indentString = "";
         for (int i = 0; i < indent; ++i) {
@@ -179,8 +153,6 @@ public final class TreeNode {
             indentString + "{\n" +
             indentString + "  \"width\": " + width + ",\n" +
             indentString + "  \"height\": " + height + ",\n" +
-            //indentString + "  \"hgap\": " + hgap + ",\n" +
-            //indentString + "  \"vgap\": " + vgap + ",\n" + 
             indentString + "  \"x\": " + x + ",\n" +
             indentString + "  \"y\": " + y);
         if (children.size() > 0) {
