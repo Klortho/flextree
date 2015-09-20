@@ -15,6 +15,14 @@ public final class TreeNode {
 
     // output
     public double x, y;
+
+    public TreeNode() {
+        this.width = 1.0;
+        this.height = 1.0;
+        this.children = new Vector<TreeNode>();
+        this.x = 0;
+        this.y = 0;
+    }
     
     public TreeNode(double width, double height, TreeNode ... children) {
         this.width = width;
@@ -144,6 +152,10 @@ public final class TreeNode {
         System.out.printf(")");        
     }
     
+    public void printJson(PrintStream out) {
+        printJson(out, 0);
+    }
+
     public void printJson(PrintStream out, int indent) {
         String indentString = "";
         for (int i = 0; i < indent; ++i) {
