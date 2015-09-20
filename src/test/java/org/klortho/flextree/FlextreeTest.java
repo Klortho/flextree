@@ -19,6 +19,8 @@ import org.klortho.flextree.*;
 public class FlextreeTest 
     extends TestCase
 {
+    private ClassLoader classLoader;
+
     /**
      * Create the test case
      *
@@ -27,6 +29,7 @@ public class FlextreeTest
     public FlextreeTest( String testName )
     {
         super( testName );
+        classLoader = getClass().getClassLoader();
     }
 
     /**
@@ -42,27 +45,36 @@ public class FlextreeTest
      */
     public void testApp()
     {
-        TreeNode tree;
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            ClassLoader classLoader = getClass().getClassLoader();
-            File before = new File(classLoader.getResource("before-1.json").getFile());
+            for (int test_num = 1; test_num <= 5; ++test_num) {
+                TreeNode tree = TreeNode.fromJson(getFile("before-" + test_num + ".json"));
+                Marshall m = new Marshall();
+                Object converted = m.convert(tree);
+                m.runOnConverted(converted);
+                m.convertBack(converted, tree);
 
-            tree = mapper.readValue(before, TreeNode.class);
+                String expected_name = "after-" + test_num + ".json";
+                TreeNode expected = TreeNode.fromJson(getFile(expected_name));
 
-            Marshall m = new Marshall();
-            Object converted = m.convert(tree);
-            m.runOnConverted(converted);
-            m.convertBack(converted, tree);
-
-            PrintStream after = new PrintStream("after.json");
-            tree.printJson(after, 0);
-            after.close();
+                boolean success = tree.deepEquals(expected);
+                if (!success) {
+                    PrintStream after = new PrintStream("after.json");
+                    after.print(tree.toJson());
+                    after.close();                
+                }
+                assertTrue("Difference found in results for " + expected_name + 
+                    ", results written to after.json",
+                    success);
+            }
         }
         catch(Exception e) {
             fail(e.getMessage());
         }
 
         assertTrue( true );
+    }
+
+    private File getFile(String name) {
+        return new File(classLoader.getResource(name).getFile());
     }
 }

@@ -165,4 +165,17 @@ public final class TreeNode {
         return json_mapper.writeValueAsString(this);
     }
 
+    public boolean deepEquals(TreeNode other) {
+        if (width != other.width ||
+            height != other.height ||
+            x != other.x ||
+            y != other.y ||
+            children.size() != other.children.size()) return false;
+
+        for (int i = 0; i < children.size(); ++i) {
+            if (!children.get(i).deepEquals(other.children.get(i))) return false;
+        }
+
+        return true;
+    }
 }
