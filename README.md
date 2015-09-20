@@ -19,6 +19,9 @@ java -cp build/classes treelayout.measure.Measure
 
 * Need to create some test cases, with data in a format that can be reused for
   both Java and JavaScript.
+    * Generate five random trees, and save them into the repo, along with
+      results. These are my test cases, to make sure I don't break anything.
+
 
 
 
