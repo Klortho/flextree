@@ -30,7 +30,7 @@ $(document).ready(function() {
 
     // Reposition everything according to the layout
     node.attr("transform", function(d) { 
-        return "translate(" + d.x + "," + d.y + ")"; 
+        return " scale(10) translate(" + d.x + "," + d.y + ")"; 
       })
       .append("rect")
         .attr("data-id", function(d) {
@@ -70,8 +70,8 @@ $(document).ready(function() {
     console.log("min_x = " + min_x + ", min_y = " + min_y + ", max_x = " + max_x + 
         ", max_y = " + max_y);
     svg.attr({
-      width: max_x - min_x,
-      height: max_y - min_y,
+      width: (max_x - min_x) * 10,
+      height: (max_y - min_y) * 10,
     });
     svg_g.attr("transform", "translate(" + (-min_x) + ", 0)");
 
