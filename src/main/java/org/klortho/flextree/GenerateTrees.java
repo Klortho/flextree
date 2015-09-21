@@ -27,7 +27,7 @@ public class GenerateTrees {
     /**
      * Returns a random tree with a set number of nodes.
      */
-    public TreeNode rand(){
+    public Tree rand(){
         return randomTree(nr);
     }
 
@@ -36,16 +36,16 @@ public class GenerateTrees {
     double minWidth, maxWidth;
     double minHeight, maxHeight;
     
-    public TreeNode randomTree(int nr) {
-        TreeNode root = randNode();
+    public Tree randomTree(int nr) {
+        Tree root = randNode();
         for (int i = 0 ; i < nr - 1 ; i++){
             root.randExpand(randNode(), rand);
         }
         return root;
     }
     
-    private TreeNode randNode() {
-        return new TreeNode( getRandomInRange(minWidth, maxWidth),
+    private Tree randNode() {
+        return new Tree( getRandomInRange(minWidth, maxWidth),
                              getRandomInRange(minHeight, maxHeight));
     }
     

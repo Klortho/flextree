@@ -14,10 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @JsonIgnoreProperties({ "boundingBox", "minX", "depth" })
-public final class TreeNode {
+public final class Tree {
     public double width, height;
     public double x, y;
-    public Vector<TreeNode> children;
+    public Vector<Tree> children;
 
     public static ObjectMapper json_mapper;
     static {
@@ -25,26 +25,26 @@ public final class TreeNode {
         json_mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    public TreeNode() {
+    public Tree() {
         this.width = 1.0;
         this.height = 1.0;
-        this.children = new Vector<TreeNode>();
+        this.children = new Vector<Tree>();
         this.x = 0;
         this.y = 0;
     }
     
-    public TreeNode(double width, double height, TreeNode ... children) {
+    public Tree(double width, double height, Tree ... children) {
         this.width = width;
         this.height = height;
-        this.children = new Vector<TreeNode>();
+        this.children = new Vector<Tree>();
         this.children.addAll(Arrays.asList(children));
     }
 
     // Create a tree from a JSON file
-    public static TreeNode fromJson(File json) 
+    public static Tree fromJson(File json) 
       throws IOException
     {
-        return json_mapper.readValue(json, TreeNode.class);
+        return json_mapper.readValue(json, Tree.class);
     }
     
     public BoundingBox getBoundingBox(){
@@ -53,17 +53,17 @@ public final class TreeNode {
         return result;
     }
     
-    private static void getBoundingBox(TreeNode tree,BoundingBox b) {
+    private static void getBoundingBox(Tree tree,BoundingBox b) {
         b.width = Math.max(b.width,tree.x + tree.width);
         b.height = Math.max(b.height,tree.y + tree.height);
-        for(TreeNode child : tree.children){
+        for(Tree child : tree.children){
             getBoundingBox(child, b);
         }
     }
     
     public void moveRight(double move){
         x += move;
-        for(TreeNode child : children){
+        for(Tree child : children){
             child.moveRight(move);
         }
     }
@@ -75,7 +75,7 @@ public final class TreeNode {
     
     public double getMinX(){
         double res = x;
-        for(TreeNode child : children){
+        for(Tree child : children){
             res = Math.min(child.getMinX(),res);
         }
         return res;
@@ -83,7 +83,7 @@ public final class TreeNode {
     
     public int size(){
         int res = 1;
-        for(TreeNode node : children){
+        for(Tree node : children){
             res += node.size();
         }
         return res;
@@ -102,22 +102,22 @@ public final class TreeNode {
                  xEnd - tolerance > xStart2 + tolerance );
     }
 
-    public boolean overlapsWith(TreeNode other) {
+    public boolean overlapsWith(Tree other) {
         return overlap(x, x + width, other.x , other.x + other.width)
                 && overlap(y, y + height, other.y, other.y + other.height);
         
     }
     
-    public void allNodes(ArrayList<TreeNode> nodes) {
+    public void allNodes(ArrayList<Tree> nodes) {
         nodes.add(this);
-        for (TreeNode node : children) {
+        for (Tree node : children) {
             node.allNodes(nodes);
         }
     }
     
     public int getDepth() {
         int res = 1;
-        for (TreeNode child : children){
+        for (Tree child : children){
             res = Math.max(res, child.getDepth() + 1);
         }
         return res;
@@ -126,7 +126,7 @@ public final class TreeNode {
     public void addSize(double hsize,double vsize){
         this.width+=hsize;
         this.height+=vsize;
-        for(TreeNode child : children){
+        for(Tree child : children){
             child.addSize(hsize,vsize);
         }
     }
@@ -138,12 +138,12 @@ public final class TreeNode {
     public void layer(double d) {
         y = d;
         d += height;
-        for (TreeNode child : children) {
+        for (Tree child : children) {
             child.layer(d);
         }
     }
     
-    public void randExpand(TreeNode t, Random r) {
+    public void randExpand(Tree t, Random r) {
         t.y += height;
         int i = r.nextInt(children.size() + 1);
         if (i == children.size()) {
@@ -154,7 +154,7 @@ public final class TreeNode {
         }
     }
     
-    public void addKid(TreeNode t){
+    public void addKid(Tree t){
         children.add(t);
     }
 
@@ -165,7 +165,7 @@ public final class TreeNode {
         return json_mapper.writeValueAsString(this);
     }
 
-    public boolean deepEquals(TreeNode other) {
+    public boolean deepEquals(Tree other) {
         if (width != other.width ||
             height != other.height ||
             x != other.x ||

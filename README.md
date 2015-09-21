@@ -20,8 +20,10 @@ mvn test
 * To do to the Java code, before porting
     * [c] Change the name of the Paper class to LayoutEngine
     * [c] Merge Marshall -> Paper (LayoutEngine)
-    * Change Marshall's convert method into "wrap", inside Paper (Layout). It should
+    * [c] Change Marshall's convert method into "wrap", inside Paper (Layout). It should
       be called by the layout() method.
+    * [c] Change the name of Tree -> WrappedTree
+    * Change TreeNode -> Tree
     * The y coordinate should be computed as part of the layout
 
 # Porting to JavaScript

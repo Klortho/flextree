@@ -47,14 +47,11 @@ public class FlextreeTest
     {
         try {
             for (int test_num = 1; test_num <= 5; ++test_num) {
-                TreeNode tree = TreeNode.fromJson(getFile("before-" + test_num + ".json"));
-
-                Object converted = LayoutEngine.convert(tree);
-                LayoutEngine.runOnConverted(converted);
-                LayoutEngine.convertBack(converted, tree);
+                Tree tree = Tree.fromJson(getFile("before-" + test_num + ".json"));
+                LayoutEngine.layout(tree);
 
                 String expected_name = "after-" + test_num + ".json";
-                TreeNode expected = TreeNode.fromJson(getFile(expected_name));
+                Tree expected = Tree.fromJson(getFile(expected_name));
 
                 boolean success = tree.deepEquals(expected);
                 if (!success) {

@@ -13,11 +13,8 @@ public class TestJackson {
         try {
             // Read it in from JSON
             File tree_json = new File("tree.json");
-            TreeNode tree = TreeNode.fromJson(tree_json);
-
-            Object converted = LayoutEngine.convert(tree);
-            LayoutEngine.runOnConverted(converted);
-            LayoutEngine.convertBack(converted, tree);
+            Tree tree = Tree.fromJson(tree_json);
+            LayoutEngine.layout(tree);
 
             PrintStream after = new PrintStream("tree-after.json");
             after.print(tree.toJson());

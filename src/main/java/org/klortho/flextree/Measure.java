@@ -10,18 +10,17 @@ public class Measure {
     public static int NR_WARMUP = 100;
     public static long SEED = 42;
     
-    static long timeLayout(TreeNode tree){
+    static long timeLayout(Tree tree){
         System.gc();
-        Object converted = LayoutEngine.convert(tree);
         long start = System.nanoTime();
-        LayoutEngine.runOnConverted(converted);
+        LayoutEngine.layout(tree);
         long now = System.nanoTime();
         return now - start;
     }
 
     static long runTests(GenerateTrees gen,  int nrTests) {
         for (int i = 0 ; i < nrTests * gen.nr ; i++){
-            TreeNode tree = gen.rand();
+            Tree tree = gen.rand();
             long res = timeLayout(tree);
             System.out.printf("%d %d\n",gen.nr,res);
         }
