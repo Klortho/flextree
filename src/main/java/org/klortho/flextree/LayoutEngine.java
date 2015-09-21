@@ -73,15 +73,16 @@ public class LayoutEngine {
         }
     }
 
-    static  void firstWalk(WrappedTree t) {
+    static void firstWalk(WrappedTree t) {
         if (t.cs == 0) { 
-            setExtremes(t); return;
+            setExtremes(t); 
+            return;
         }
         firstWalk(t.c[0]);
 
         // Create siblings in contour minimal vertical coordinate and index list.
-        IYL ih =  updateIYL(bottom(t.c[0].el), 0, null);                    
-        for (int i = 1; i < t.cs; i++){
+        IYL ih = updateIYL(bottom(t.c[0].el), 0, null);                    
+        for (int i = 1; i < t.cs; i++) {
             firstWalk(t.c[i]);
 
             // Store lowest vertical coordinate while extreme nodes still point in 
