@@ -27,6 +27,12 @@ public class LayoutEngine {
     static void layout(Tree t) { 
         WrappedTree wrapped = wrapTree(t);
 
+
+        // "Walk zero" sets the y-coordinates, 
+        // which depend only on the y_size of the ancestor nodes.
+        wrapped.y = 0;
+        zerothWalk(wrapped);
+
         firstWalk(wrapped); 
         secondWalk(wrapped, 0); 
 
@@ -44,11 +50,22 @@ public class LayoutEngine {
 
     static void convertBack(WrappedTree wrapped, Tree n) {
         n.x = wrapped.x;
+        n.y = wrapped.y;
         for (int i = 0 ; i < wrapped.c.length ; i++) {
             convertBack(wrapped.c[i], n.children.get(i));
         }
     }
 
+
+    // Recursively set the y coordinate of the children, based on
+    // the y coordinate of the parent, and its height
+    static void zerothWalk(WrappedTree t) {
+        double c_y = t.y + t.h;
+        for (int i = 0; i < t.cs; ++i) {
+            t.c[i].y = c_y;
+            zerothWalk(t.c[i]);
+        }
+    }
 
     static  void firstWalk(WrappedTree t) {
         if (t.cs == 0) { 

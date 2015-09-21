@@ -23,7 +23,7 @@ mvn test
     * [c] Change Marshall's convert method into "wrap", inside Paper (Layout). It should
       be called by the layout() method.
     * [c] Change the name of Tree -> WrappedTree
-    * Change TreeNode -> Tree
+    * [c] Change TreeNode -> Tree
     * The y coordinate should be computed as part of the layout
 
 # Porting to JavaScript
