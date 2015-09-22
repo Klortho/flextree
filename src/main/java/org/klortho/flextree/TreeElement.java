@@ -20,9 +20,14 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 
+/**
+ * This generates a random tree, and displays it in SWT.
+ */
 
-
-public class TreeElement extends Composite implements SelectionListener, PaintListener, ControlListener , Listener, KeyListener{
+public class TreeElement 
+  extends Composite 
+  implements SelectionListener, PaintListener, ControlListener , Listener, KeyListener
+{
 	TreeNode tree ;
 	double xOffset, yOffset;
 	double width, height;
@@ -32,7 +37,7 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 	Marshall m;
 	Random rand;
 	
-	public static int SEED = 42;
+	public static int SEED = 43;
 	
 	public TreeElement(Composite parent) {
 		super(parent, SWT.H_SCROLL | SWT.V_SCROLL);
@@ -49,37 +54,29 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 		reinit();
 	}
 	
-	
-	public void reinit(){
-//		tree = new TreeNode(10, 10, new TreeNode(10,10,new TreeNode(10,10,new TreeNode(10,10),new TreeNode(10,10))), new TreeNode(10,10,new TreeNode(10,10), new TreeNode(10,10,new TreeNode(10,10))));
-
-		//do {
+	public void reinit() {
 		tree = gen.rand();
 		tree.addGap(10,10);
 		doLayout();
-		//}while(!overlap());
 	}
 
 	
-	public boolean overlap(){
+	// FIXME: move this into a unit test; it is not used here:
+	public boolean overlap() {
 		ArrayList<TreeNode> nodes = new ArrayList<TreeNode>();
 		tree.allNodes(nodes);
-		for(int i = 0 ; i < nodes.size(); i++){
+		for (int i = 0 ; i < nodes.size(); i++) {
 			for(int j = 0 ; j < i ; j++){
-				if(nodes.get(i).overlapsWith(nodes.get(j))){
+				if (nodes.get(i).overlapsWith(nodes.get(j))){
 					System.out.printf("Overlap %d %d!!\n",i,j);
 					return true;
 				}
 			}
 		}
 		return false;
-
 	}
-
-	
 	
 	public void doLayout() {
-		System.out.printf("Starting layout... \n");
 		long start = System.currentTimeMillis();
 		tree.layer();
 		Object converted = m.convert(tree);
@@ -93,8 +90,6 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 		width = b.width;
 		height = b.height;
 	}
-
-
 
 	public void setScrollBars() {
 		Rectangle r = getClientArea();
@@ -124,10 +119,8 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 		
 	}
 	
-
-	
 	static int roundInt(double b){
-		return (int)(b+0.5);
+		return (int)(b + 0.5);
 	}
 	
 	@Override
@@ -140,8 +133,6 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {	
 	}
-
-
 	
 	void paintTree(TreeNode root, GC gc,Rectangle r){
 		Color c = new Color(gc.getDevice(), new RGB((int)((rand.nextDouble() * 150) ), (int)((rand.nextDouble() * 150)), (int)((rand.nextDouble() * 150) )));
@@ -150,10 +141,9 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 			gc.setAlpha(255);
 			gc.drawRectangle(roundInt(zoom * (root.x + root.hgap/2 - xOffset)), roundInt(zoom * (root.y + root.vgap/2 -yOffset)), roundInt(zoom * (root.width - root.hgap)), roundInt(zoom * (root.height -  root.vgap)));
 			c.dispose();
-		if(root.children.size() > 0){
+		if (root.children.size() > 0){
 			double endYRoot =  root.y + root.height -root.vgap/2 ;
 			double rootMiddle = root.x + root.width/2.0;
-			
 			double middleY = endYRoot + root.vgap/2;
 			gc.drawLine(roundInt(zoom *(rootMiddle-xOffset)), roundInt(zoom *( endYRoot -yOffset)), roundInt(zoom * (rootMiddle-xOffset)),roundInt(zoom * (middleY -yOffset)) );
 			TreeNode firstKid = root.children.get(0);
@@ -180,7 +170,6 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 		e.gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		rand = new Random(SEED);
 		paintTree(tree, e.gc, r);
-	
 	}
 
 	@Override
@@ -191,8 +180,6 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 	public void controlResized(ControlEvent e) {
 		setScrollBars();
 	}
-
-
 
 	@Override
 	public void handleEvent(Event event) {
@@ -219,11 +206,13 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if(e.keyCode == 'z'){
+		if (e.keyCode == 'z'){
 			reinit();
-		} else if(e.keyCode == 'a'){
+		} 
+		else if (e.keyCode == 'a'){
 			doLayout();
-		} else if(e.keyCode == 'p'){
+		} 
+		else if (e.keyCode == 'p'){
 			tree.print();
 			System.out.printf("\n");
 		} 
@@ -233,7 +222,6 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		
 	}
 
 
