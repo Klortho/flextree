@@ -1,10 +1,7 @@
 package treelayout.measure;
 
-import java.util.Arrays;
-
 import treelayout.GenerateTrees;
 import treelayout.TreeNode;
-
 import treelayout.algorithm.Marshall;
 
 public class Measure {
