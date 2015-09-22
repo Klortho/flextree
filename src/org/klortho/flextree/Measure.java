@@ -1,8 +1,4 @@
-package treelayout.measure;
-
-import treelayout.GenerateTrees;
-import treelayout.TreeNode;
-import treelayout.algorithm.Marshall;
+package org.klortho.flextree;
 
 public class Measure {
 

@@ -1,4 +1,4 @@
-package treelayout.swt;
+package org.klortho.flextree;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -18,11 +18,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-
-import treelayout.BoundingBox;
-import treelayout.GenerateTrees;
-import treelayout.TreeNode;
-import treelayout.algorithm.Marshall;
 
 
 

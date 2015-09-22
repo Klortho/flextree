@@ -1,4 +1,4 @@
-package treelayout.swt;
+package org.klortho.flextree;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;

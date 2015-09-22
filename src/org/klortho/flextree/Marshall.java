@@ -1,9 +1,8 @@
-package treelayout.algorithm;
+package org.klortho.flextree;
 
 
 
-import treelayout.TreeNode;
-import treelayout.algorithm.Paper.Tree;
+import org.klortho.flextree.Paper.Tree;
 
 public class Marshall{
 
