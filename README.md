@@ -3,11 +3,16 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 # Compiling and running
 
 * Download and install Eclipse.
-* Download the SWT binaries from http://www.eclipse.org/downloads -> select
-  Eclipse release 4.5, then SWT binary and source, for whatever platform you are on.
+* Download the SWT binaries from [here](https://www.eclipse.org/swt/), 
+  for whatever platform you are on.
 * In Eclipse, selected File -> Import, then "Existing project into workspace", then
   selected "archive file", and selected the .zip file you just downloaded.
 
+* Clone this repository, then, in Eclipse, File -> Import -> "Existing project into
+  workspace", then select this repository's root directory. Make sure you de-select
+  "Copy projects into workspace".
+* Right click on this flextree project, and select Properties. Under "Java Build 
+  Path", check "org.eclipse.swt". This includes the SWT library as a dependency.
 
 
 
@@ -15,6 +20,7 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 * Implement my unit test again, that takes canned input from JSON files, and compares
   the layout results with after-trees, also from JSON.
+    * Also test the result to make sure there are no overlaps.
 
 * My main program will have these features:
     * Input: 
