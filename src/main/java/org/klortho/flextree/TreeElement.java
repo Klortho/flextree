@@ -28,12 +28,12 @@ public class TreeElement
   extends Composite 
   implements SelectionListener, PaintListener, ControlListener , Listener, KeyListener
 {
-	TreeNode tree ;
+	Tree tree ;
 	double xOffset, yOffset;
 	double width, height;
 	double zoom = 1.0;
 	double vgap = 15;
-	GenerateTrees gen;
+	RandomTreeGenerator gen;
 	Marshall m;
 	Random rand;
 	
@@ -48,33 +48,19 @@ public class TreeElement
 		addControlListener(this);	
 		addKeyListener(this);
 		addListener(SWT.MouseVerticalWheel, this);
-		gen = new GenerateTrees(50, 10, 100, 10, 100, (int)Math.random() * 1000);
+		gen = new RandomTreeGenerator(50, 10, 100, 10, 100, (int) Math.random() * 1000);
 		m = new Marshall();
 		rand = new Random();
 		reinit();
 	}
 	
 	public void reinit() {
-		tree = gen.rand();
+		tree = gen.randomTree();
+		tree.print();
 		tree.addGap(10,10);
 		doLayout();
 	}
 
-	
-	// FIXME: move this into a unit test; it is not used here:
-	public boolean overlap() {
-		ArrayList<TreeNode> nodes = new ArrayList<TreeNode>();
-		tree.allNodes(nodes);
-		for (int i = 0 ; i < nodes.size(); i++) {
-			for(int j = 0 ; j < i ; j++){
-				if (nodes.get(i).overlapsWith(nodes.get(j))){
-					System.out.printf("Overlap %d %d!!\n",i,j);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 	
 	public void doLayout() {
 		long start = System.currentTimeMillis();
@@ -83,7 +69,7 @@ public class TreeElement
 		m.runOnConverted(converted);
 		long now = System.currentTimeMillis();
 		long dur = now - start;
-		System.out.printf("Layout in %d ms \n\n",dur);
+		System.out.printf("\nLayout in %d ms \n\n",dur);
 		m.convertBack(converted, tree);
 		tree.normalizeX();
 		BoundingBox b = tree.getBoundingBox();
@@ -134,28 +120,46 @@ public class TreeElement
 	public void widgetDefaultSelected(SelectionEvent e) {	
 	}
 	
-	void paintTree(TreeNode root, GC gc,Rectangle r){
+	void paintTree(Tree root, GC gc,Rectangle r){
 		Color c = new Color(gc.getDevice(), new RGB((int)((rand.nextDouble() * 150) ), (int)((rand.nextDouble() * 150)), (int)((rand.nextDouble() * 150) )));
 		gc.setBackground(c);
-			gc.fillRectangle(roundInt(zoom * (root.x + root.hgap/2 - xOffset)), roundInt(zoom * (root.y + root.vgap/2 -yOffset)), roundInt(zoom * (root.width - root.hgap)), roundInt(zoom * (root.height - root.vgap)));
+			gc.fillRectangle(roundInt(zoom * (root.x + root.hgap/2 - xOffset)), 
+					         roundInt(zoom * (root.y + root.vgap/2 -yOffset)), 
+					         roundInt(zoom * (root.width - root.hgap)), 
+					         roundInt(zoom * (root.height - root.vgap)));
 			gc.setAlpha(255);
-			gc.drawRectangle(roundInt(zoom * (root.x + root.hgap/2 - xOffset)), roundInt(zoom * (root.y + root.vgap/2 -yOffset)), roundInt(zoom * (root.width - root.hgap)), roundInt(zoom * (root.height -  root.vgap)));
+			gc.drawRectangle(roundInt(zoom * (root.x + root.hgap/2 - xOffset)), 
+					         roundInt(zoom * (root.y + root.vgap/2 -yOffset)), 
+					         roundInt(zoom * (root.width - root.hgap)), 
+					         roundInt(zoom * (root.height -  root.vgap)));
 			c.dispose();
 		if (root.children.size() > 0){
 			double endYRoot =  root.y + root.height -root.vgap/2 ;
 			double rootMiddle = root.x + root.width/2.0;
 			double middleY = endYRoot + root.vgap/2;
-			gc.drawLine(roundInt(zoom *(rootMiddle-xOffset)), roundInt(zoom *( endYRoot -yOffset)), roundInt(zoom * (rootMiddle-xOffset)),roundInt(zoom * (middleY -yOffset)) );
-			TreeNode firstKid = root.children.get(0);
+			gc.drawLine(roundInt(zoom *(rootMiddle-xOffset)), 
+					    roundInt(zoom *( endYRoot -yOffset)), 
+					    roundInt(zoom * (rootMiddle-xOffset)),
+					    roundInt(zoom * (middleY -yOffset)) );
+			Tree firstKid = root.children.get(0);
 			double middleFirstKid =  firstKid.x + firstKid.width/2.0;
-			TreeNode lastKid = root.children.get(root.children.size()-1);
+			Tree lastKid = root.children.get(root.children.size()-1);
 			double middleLastKid = lastKid.x + lastKid.width/2.0;
-			gc.drawLine(roundInt(zoom *(middleFirstKid-xOffset)), roundInt(zoom * (middleY-yOffset)), roundInt(zoom * (rootMiddle-xOffset)),roundInt(zoom * (middleY -yOffset)));
-			gc.drawLine(roundInt(zoom *(middleFirstKid-xOffset)), roundInt(zoom * (middleY-yOffset)), roundInt(zoom * (middleLastKid-xOffset)),roundInt(zoom * (middleY -yOffset)));
-			for(TreeNode kid : root.children){
+			gc.drawLine(roundInt(zoom *(middleFirstKid-xOffset)), 
+					    roundInt(zoom * (middleY-yOffset)), 
+					    roundInt(zoom * (rootMiddle-xOffset)),
+					    roundInt(zoom * (middleY -yOffset)));
+			gc.drawLine(roundInt(zoom *(middleFirstKid-xOffset)), 
+					    roundInt(zoom * (middleY-yOffset)), 
+					    roundInt(zoom * (middleLastKid-xOffset)),
+					    roundInt(zoom * (middleY -yOffset)));
+			for(Tree kid : root.children){
 				double middleKid = kid.x + kid.width/2.0;
 				paintTree(kid, gc, r);
-				gc.drawLine(roundInt(zoom *(middleKid-xOffset)), roundInt(zoom *(middleY-yOffset)), roundInt(zoom *(middleKid-xOffset)), roundInt(zoom *( kid.y + kid.vgap/2.0 -yOffset)));
+				gc.drawLine(roundInt(zoom *(middleKid-xOffset)), 
+						    roundInt(zoom *(middleY-yOffset)), 
+						    roundInt(zoom *(middleKid-xOffset)), 
+						    roundInt(zoom *( kid.y + kid.vgap/2.0 -yOffset)));
 			}
 		}
 	}

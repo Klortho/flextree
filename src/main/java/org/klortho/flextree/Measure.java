@@ -8,7 +8,7 @@ public class Measure {
 	public static int NR_WARMUP = 100;
 	public static long SEED = 42;
 	
-	static long timeLayout(TreeNode tree){
+	static long timeLayout(Tree tree){
 		System.gc();
 		Marshall m = new Marshall();
 		Object converted = m.convert(tree);
@@ -16,36 +16,26 @@ public class Measure {
 		m.runOnConverted(converted);
 		long now = System.nanoTime();
 		return now - start;
-		
-		
 	}
-	
 
-	static long runTests(GenerateTrees gen,  int nrTests){
-		//long[] results = new long[nrTests];
-	
-		for(int i = 0 ; i < nrTests * gen.nr ; i++){
-			TreeNode tree = gen.rand();
+	static long runTests(RandomTreeGenerator gen,  int nrTests) {
+		for(int i = 0 ; i < nrTests * gen.numNodes ; i++){
+			Tree tree = gen.randomTree();
 			long res = timeLayout(tree);
-			System.out.printf("%d %d\n",gen.nr,res);
+			System.out.printf("%d %d\n",gen.numNodes,res);
 		}
 		return 0;
-		//return getMedian(results);
 	}
 	
 	static void measureArbitrarilySized(){
-		for(int i = 1; i < MAX_SIZE; i+= INCREMENT){
-				GenerateTrees gen = new GenerateTrees(i, 1, 10,1, 10, 5000);
-				runTests(gen, NR_TESTS);
-				//System.out.printf("%40s %15d %15d\n",alg.toString(), i, medianOfTests(gen, alg.alg, NR_TESTS));
+		for (int i = 1; i < MAX_SIZE; i+= INCREMENT){
+			RandomTreeGenerator gen = new RandomTreeGenerator(i, 1, 10,1, 10, 5000);
+			runTests(gen, NR_TESTS);
 		}
 	}
 	
-	public static void main(String[] argv){
+	public static void main(String[] argv) {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-
-		measureArbitrarilySized();
-		
+		measureArbitrarilySized();		
 	}
-	
 }
