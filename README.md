@@ -16,19 +16,14 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 # To do
 
-* [c] Implement my unit test again, that takes canned input from JSON files, and compares
-  the layout results with after-trees, also from JSON.
-    * [c] Also test the result to make sure there are no overlaps.
 
-* Get rid of addGap in the SWT test -- instead, subtract from width/height when drawing
-  the boxes.
+* Finish working on the RenderSWT/TreeSWT interface:
+    * All the API should be moved to RenderSWT, including what's needed inside
+      z-handler.
+    * Need also to define hgap, vgap, and zoom there.
+    * hgap, vgap, and zoom should, by default, be determined dynamically, if
+      it is easy.
 
-
-
-
-* [c] For each of the "after" trees in the test: view them in SWT, and visually check them.
-
-* Make a couple more test cases: from the papers, and the trouble one from dtd-diagram
 
 
 * My main program will have these features:

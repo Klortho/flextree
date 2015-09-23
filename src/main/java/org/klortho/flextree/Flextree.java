@@ -17,7 +17,8 @@ public class Flextree {
             tree = Tree.fromJson(new File("src/test/resources/before-6.json"));
 		} catch(Exception e) {}
 
-		
+		// The following function is used to handle when the user presses the `z` key in
+		// the tree display. It generates a new random tree and re-renders.
 		KeyHandler z_handler = new KeyHandler() {
 			public void execute(TreeSWT swt) { 
 				swt.tree = gen.randomTree();

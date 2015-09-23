@@ -66,8 +66,10 @@ public class TreeSWT
 	 * Render the Tree that was passed in from the constructor.
 	 */
 	public void render() {
+		// FIXME: what does this do?
 		tree.layer();
 		LayoutEngine.layout(tree);
+		// FIXME: what does this do?
 		tree.normalizeX();
 		BoundingBox b = tree.getBoundingBox();
 		width = b.width;
