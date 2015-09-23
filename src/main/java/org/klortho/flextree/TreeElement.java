@@ -1,5 +1,4 @@
 package org.klortho.flextree;
-import java.util.ArrayList;
 import java.util.Random;
 
 import org.eclipse.swt.SWT;
@@ -57,7 +56,7 @@ public class TreeElement
 	public void reinit() {
 		tree = gen.randomTree();
 		tree.print();
-		tree.addGap(10,10);
+		//tree.addGap(10,10);
 		doLayout();
 	}
 
@@ -80,39 +79,41 @@ public class TreeElement
 	public void setScrollBars() {
 		Rectangle r = getClientArea();
 		double w = r.width / zoom;
-		if(w < width){
+		if (w < width) {
 			getHorizontalBar().setVisible(true);
 			getHorizontalBar().setMinimum(0);
-			getHorizontalBar().setMaximum((int)width);
-			getHorizontalBar().setThumb((int)(r.width / zoom));
+			getHorizontalBar().setMaximum((int) width);
+			getHorizontalBar().setThumb((int) (r.width / zoom));
 			getHorizontalBar().setIncrement(50);
-			getHorizontalBar().setPageIncrement((int)(r.width / zoom));
+			getHorizontalBar().setPageIncrement((int) (r.width / zoom));
 
-		} else {
+		} 
+		else {
 			getHorizontalBar().setVisible(false);
 		}
 		double h = r.height / zoom;
-		if(h < height){
+		if (h < height) {
 			getVerticalBar().setVisible(true);
 			getVerticalBar().setMinimum(0);
 			getVerticalBar().setMaximum((int)height);
 			getVerticalBar().setThumb((int)(r.height/zoom));
 			getVerticalBar().setIncrement(50);
 			getVerticalBar().setPageIncrement((int)(r.height/zoom));
-		} else {
+		} 
+		else {
 			getVerticalBar().setVisible(false);
 		}
 		
 	}
 	
 	static int roundInt(double b){
-		return (int)(b + 0.5);
+		return (int) (b + 0.5);
 	}
 	
 	@Override
 	public void widgetSelected(SelectionEvent e) {
-		xOffset = getHorizontalBar().getSelection() ;
-		yOffset = getVerticalBar().getSelection() ;
+		xOffset = getHorizontalBar().getSelection();
+		yOffset = getVerticalBar().getSelection();
 		redraw();
 	}
 	
@@ -121,7 +122,10 @@ public class TreeElement
 	}
 	
 	void paintTree(Tree root, GC gc,Rectangle r){
-		Color c = new Color(gc.getDevice(), new RGB((int)((rand.nextDouble() * 150) ), (int)((rand.nextDouble() * 150)), (int)((rand.nextDouble() * 150) )));
+		Color c = new Color(gc.getDevice(), 
+				new RGB((int) ((rand.nextDouble() * 150)), 
+						(int) ((rand.nextDouble() * 150)), 
+						(int) ((rand.nextDouble() * 150))));
 		gc.setBackground(c);
 			gc.fillRectangle(roundInt(zoom * (root.x + root.hgap/2 - xOffset)), 
 					         roundInt(zoom * (root.y + root.vgap/2 -yOffset)), 
@@ -133,7 +137,7 @@ public class TreeElement
 					         roundInt(zoom * (root.width - root.hgap)), 
 					         roundInt(zoom * (root.height -  root.vgap)));
 			c.dispose();
-		if (root.children.size() > 0){
+		if (root.children.size() > 0) {
 			double endYRoot =  root.y + root.height -root.vgap/2 ;
 			double rootMiddle = root.x + root.width/2.0;
 			double middleY = endYRoot + root.vgap/2;
@@ -145,21 +149,21 @@ public class TreeElement
 			double middleFirstKid =  firstKid.x + firstKid.width/2.0;
 			Tree lastKid = root.children.get(root.children.size()-1);
 			double middleLastKid = lastKid.x + lastKid.width/2.0;
-			gc.drawLine(roundInt(zoom *(middleFirstKid-xOffset)), 
-					    roundInt(zoom * (middleY-yOffset)), 
-					    roundInt(zoom * (rootMiddle-xOffset)),
-					    roundInt(zoom * (middleY -yOffset)));
-			gc.drawLine(roundInt(zoom *(middleFirstKid-xOffset)), 
-					    roundInt(zoom * (middleY-yOffset)), 
-					    roundInt(zoom * (middleLastKid-xOffset)),
-					    roundInt(zoom * (middleY -yOffset)));
+			gc.drawLine(roundInt(zoom * (middleFirstKid - xOffset)), 
+					    roundInt(zoom * (middleY - yOffset)), 
+					    roundInt(zoom * (rootMiddle - xOffset)),
+					    roundInt(zoom * (middleY - yOffset)));
+			gc.drawLine(roundInt(zoom * (middleFirstKid - xOffset)), 
+					    roundInt(zoom * (middleY - yOffset)), 
+					    roundInt(zoom * (middleLastKid - xOffset)),
+					    roundInt(zoom * (middleY - yOffset)));
 			for(Tree kid : root.children){
 				double middleKid = kid.x + kid.width/2.0;
 				paintTree(kid, gc, r);
-				gc.drawLine(roundInt(zoom *(middleKid-xOffset)), 
-						    roundInt(zoom *(middleY-yOffset)), 
-						    roundInt(zoom *(middleKid-xOffset)), 
-						    roundInt(zoom *( kid.y + kid.vgap/2.0 -yOffset)));
+				gc.drawLine(roundInt(zoom * (middleKid-xOffset)), 
+						    roundInt(zoom * (middleY-yOffset)), 
+						    roundInt(zoom * (middleKid-xOffset)), 
+						    roundInt(zoom * (kid.y + kid.vgap/2.0 -yOffset)));
 			}
 		}
 	}
@@ -189,7 +193,7 @@ public class TreeElement
 	public void handleEvent(Event event) {
 		Rectangle r = getClientArea();
 		
-		if((event.stateMask & SWT.CONTROL) != 0){
+		if ((event.stateMask & SWT.CONTROL) != 0){
 			event.doit= false;
 			double locX = xOffset + event.x / zoom;
 			double locY = yOffset + event.y / zoom;

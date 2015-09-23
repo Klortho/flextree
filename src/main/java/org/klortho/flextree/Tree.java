@@ -1,27 +1,65 @@
 package org.klortho.flextree;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
+@JsonIgnoreProperties({ "boundingBox", "minX", "depth", "hgap", "vgap" })
 public final class Tree {
-
 	// input
 	public double width, height;
 	public Vector<Tree> children;
 	public double hgap, vgap;
 	// output
-	public double x,y;
-	
-	public Tree(double width, double height, Tree ... children){
+	public double x, y;
+
+    public static ObjectMapper json_mapper;
+    static {
+        json_mapper = new ObjectMapper();
+        json_mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
+
+    /**
+     * Default constructor is needed by Jackson, to enable reading in
+     * objects from JSON.
+     */
+    public Tree() {
+        this.width = 1.0;
+        this.height = 1.0;
+        this.children = new Vector<Tree>();
+        this.x = 0;
+        this.y = 0;
+    }
+
+    public Tree(double width, double height, Tree ... children) {
 		this.width = width;
 		this.height = height;
 		this.children = new Vector<Tree>();
 		this.children.addAll(Arrays.asList(children));
 	}
-	
+
+    // Create a tree from a JSON file
+    public static Tree fromJson(File json) 
+      throws IOException
+    {
+        return json_mapper.readValue(json, Tree.class);
+    }
+
+    public String toJson() 
+      throws JsonProcessingException
+    {
+        return json_mapper.writeValueAsString(this);
+    }
+
+
 	public BoundingBox getBoundingBox(){
 		BoundingBox result = new BoundingBox(0, 0);
 		getBoundingBox(this,result);
@@ -68,19 +106,6 @@ public final class Tree {
 		return children.size() > 0;
 	}
 	
-	final static double tolerance = 0.0;
-	
-	private boolean overlap(double xStart, double xEnd, double xStart2, double xEnd2){
-		return (xStart2 + tolerance < xEnd - tolerance  && xEnd2 - tolerance > xStart + tolerance) ||
-				 (xStart + tolerance < xEnd2 - tolerance && xEnd - tolerance > xStart2 + tolerance);
-	}
-	
-	public boolean overlapsWith(Tree other){
-		return overlap(x, x + width, other.x , other.x + other.width)
-				&& overlap(y, y + height, other.y, other.y + other.height);
-		
-	}
-	
 	public void allNodes(ArrayList<Tree> nodes) {
 		nodes.add(this);
 		for(Tree node : children){
@@ -88,29 +113,29 @@ public final class Tree {
 		}
 	}
 	
-	public int getDepth(){
+	public int getDepth() {
 		int res = 1;
-		for(Tree child : children){
+		for (Tree child : children) {
 			res = Math.max(res, child.getDepth() + 1);
 		}
 		return res;
 	}
 	
-	public void addGap(double hgap,double vgap){
+	public void addGap(double hgap, double vgap) {
 		this.hgap += hgap;
 		this.vgap += vgap;
-		this.width+=2*hgap;
-		this.height+=2*vgap;
-		for(Tree child : children){
-			child.addGap(hgap,vgap);
+		this.width += 2 * hgap;
+		this.height += 2 * vgap;
+		for (Tree child : children) {
+			child.addGap(hgap, vgap);
 		}
 	}
 	
-	public void addSize(double hsize,double vsize){
+	public void addSize(double hsize, double vsize) {
 		this.width+=hsize;
 		this.height+=vsize;
 		for(Tree child : children){
-			child.addSize(hsize,vsize);
+			child.addSize(hsize, vsize);
 		}
 	}
 	
@@ -175,4 +200,30 @@ public final class Tree {
 	public void addKid(Tree t){
 		children.add(t);
 	}
+
+	/**
+	 * Compare two trees in terms of the size and positions of their nodes
+	 */
+    public boolean deepEquals(Tree other) {
+        if (width != other.width ||
+            height != other.height ||
+            x != other.x ||
+            y != other.y ||
+            children.size() != other.children.size()) //return false;
+        {
+        	System.out.println("mismatch:\n" +
+            		"width: " + width + " <=> " + other.width + "\n" +
+            		"height: " + height + " <=> " + other.height + "\n" +
+            		"x: " + x + " <=> " + other.x + "\n" +
+            		"y: " + y + " <=> " + other.y + "\n"
+            );
+        	return false;
+        }
+
+        for (int i = 0; i < children.size(); ++i) {
+            if (!children.get(i).deepEquals(other.children.get(i))) return false;
+        }
+
+        return true;
+    }
 }

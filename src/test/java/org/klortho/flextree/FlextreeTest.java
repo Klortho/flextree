@@ -1,6 +1,7 @@
 package org.klortho.flextree;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import junit.framework.Test;
@@ -40,8 +41,8 @@ public class FlextreeTest extends TestCase {
 		ArrayList<Tree> nodes = new ArrayList<Tree>();
 		tree.allNodes(nodes);
 		for (int i = 0 ; i < nodes.size(); i++) {
-			for(int j = 0 ; j < i ; j++){
-				if (nodes.get(i).overlapsWith(nodes.get(j))){
+			for (int j = 0 ; j < i ; j++) {
+				if (nodeOverlaps(nodes.get(i), nodes.get(j))){
 					System.out.printf("Overlap %d %d!!\n",i,j);
 					return true;
 				}
@@ -49,6 +50,19 @@ public class FlextreeTest extends TestCase {
 		}
 		return false;
 	}
+
+	private static boolean overlap(double xStart, double xEnd, 
+			                       double xStart2, double xEnd2) 
+	{
+		return (xStart2 < xEnd && xEnd2 > xStart) ||
+               (xStart < xEnd2 && xEnd > xStart2);
+	}
+
+	public static boolean nodeOverlaps(Tree a, Tree b) {
+		return overlap(a.x, a.x + a.width, b.x , b.x + b.width) &&
+			   overlap(a.y, a.y + a.height, b.y, b.y + b.height);
+	}
+	
 
 	public static Tree sampleTree() {
 		return new Tree(76.000000, 31.500000,
@@ -129,7 +143,7 @@ public class FlextreeTest extends TestCase {
 	}
 
 	public void layoutAndCheckTree(Tree t) {
-    	t.addGap(10, 10);  // FIXME: what does this do?
+    	//t.addGap(10, 10);  // FIXME: what does this do?
     	
     	// FIXME: after you get the test written, refactor to move this stuff into
     	// the LayoutEngine's layout method:
@@ -168,11 +182,13 @@ public class FlextreeTest extends TestCase {
      */
     public void testApp()
     {
-    /*
         try {
             for (int test_num = 1; test_num <= 5; ++test_num) {
+            	System.out.println("f = ");
+            	File f = getFile("before-" + test_num + ".json");
                 Tree tree = Tree.fromJson(getFile("before-" + test_num + ".json"));
-                LayoutEngine.layout(tree);
+                tree.print();
+        		layoutAndCheckTree(tree);
 
                 String expected_name = "after-" + test_num + ".json";
                 Tree expected = Tree.fromJson(getFile(expected_name));
@@ -189,13 +205,14 @@ public class FlextreeTest extends TestCase {
             }
         }
         catch(Exception e) {
+        	System.out.println(e.getMessage());
             fail(e.getMessage());
         }
-	*/
         assertTrue( true );        
     }
 
     private File getFile(String name) {
+    	System.out.println("name = " + name);
         return new File(classLoader.getResource(name).getFile());
     }
 
