@@ -7,13 +7,9 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
   for whatever platform you are on.
 * In Eclipse, selected File -> Import, then "Existing project into workspace", then
   selected "archive file", and selected the .zip file you just downloaded.
-
 * Clone this repository, then, in Eclipse, File -> Import -> "Existing project into
   workspace", then select this repository's root directory. Make sure you de-select
   "Copy projects into workspace".
-* Right click on this flextree project, and select Properties. Under "Java Build 
-  Path", check "org.eclipse.swt". This includes the SWT library as a dependency.
-
 * Then, you should be able to right-click on Flextree.java (under src/main/java),
   and select Run as -> Java application.
 

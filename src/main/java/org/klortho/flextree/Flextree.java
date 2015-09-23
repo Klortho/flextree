@@ -1,32 +1,29 @@
 package org.klortho.flextree;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
+import java.io.File;
 
-public class Flextree extends Composite {
+import org.klortho.flextree.RenderSWT.KeyHandler;
 
-	TreeElement a, b;
-	Flextree(Composite parent) {
-		super(parent, SWT.NONE);
-		setLayout(new FillLayout(SWT.VERTICAL));
-		a = new TreeElement(this);
-	}
+public class Flextree {
+	static RandomTreeGenerator gen;
+	static Tree tree;
 
 	public static void main(String argv[]) {
-		final Display display = new Display ();
-		final Shell shell = new Shell (display, SWT.SHELL_TRIM);
-		shell.setLayout(new FillLayout ());
-		shell.setSize (1000, 800);
-		new Flextree(shell);
-		shell.pack();
-		shell.open ();
-		while (!shell.isDisposed ()) {
-			if (display != null && !display.readAndDispatch ())
-				display.sleep ();
-		}
-		display.dispose();
+		gen = new RandomTreeGenerator(50, 20, 100, 20, 100, (int) Math.random() * 1000);
+		
+		// Two ways to make a tree:
+		//tree = gen.randomTree();
+		try {
+            tree = Tree.fromJson(new File("src/test/resources/before-6.json"));
+		} catch(Exception e) {}
+
+		
+		KeyHandler z_handler = new KeyHandler() {
+			public void execute(TreeSWT swt) { 
+				swt.tree = gen.randomTree();
+				swt.render();
+			}
+		};
+		RenderSWT.render(tree, z_handler);
 	}
 }

@@ -17,58 +17,55 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.klortho.flextree.LayoutEngine.WrappedTree;
+import org.klortho.flextree.RenderSWT.KeyHandler;
 
 
 /**
- * This generates a random tree, and displays it in SWT.
+ * This class is managed by RenderSWT -- you shouldn't need to access it directly.
  */
 
-public class TreeElement 
+public class TreeSWT 
   extends Composite 
   implements SelectionListener, PaintListener, ControlListener , Listener, KeyListener
 {
-	Tree tree ;
+	Tree tree;
+	
 	double xOffset, yOffset;
 	double width, height;
-	double zoom = 1.0;
-	RandomTreeGenerator gen;
-	Marshall m;
-	Random rand;
-	double hgap, vgap;
+	static int SEED = 43;
+	Random rand = new Random(SEED);
+
+	static final double HGAP_DEFAULT = 10.0;
+	static final double VGAP_DEFAULT = 10.0;
+	static final double ZOOM_DEFAULT = 1.0;
+
+	double hgap = HGAP_DEFAULT;
+	double vgap = VGAP_DEFAULT;
+	double zoom = ZOOM_DEFAULT;
+
+	KeyHandler z_handler; 
 	
-	public static int SEED = 43;
-	
-	public TreeElement(Composite parent) {
+	public TreeSWT(Composite parent, Tree tree, KeyHandler z_handler) {
 		super(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		this.z_handler = z_handler;
+		init(tree);
+	}
+	
+	private void init(Tree tree) {
+		this.tree = tree;
 		addPaintListener(this);
 		getHorizontalBar().addSelectionListener(this);
 		getVerticalBar().addSelectionListener(this);
 		addControlListener(this);	
 		addKeyListener(this);
 		addListener(SWT.MouseVerticalWheel, this);
-		gen = new RandomTreeGenerator(50, 20, 100, 20, 100, (int) Math.random() * 1000);
-		m = new Marshall();
-		rand = new Random();
-		reinit();
+		render();
 	}
 	
-	public void reinit() {
-		hgap = vgap = 10;
-		tree = gen.randomTree();
-		//try {
-    	//	tree = Tree.fromJson(new File("src/test/resources/before-6.json"));
-		//} 
-		//catch (Exception e) {}
-		doLayout();
-		//try {
-	    //    PrintStream after = new PrintStream("after.json");
-	    //    after.print(tree.toJson());
-	    //    after.close();                
-		//} catch (Exception e) {}
-	}
-
-	public void doLayout() {
+	/**
+	 * Render the Tree that was passed in from the constructor.
+	 */
+	public void render() {
 		tree.layer();
 		LayoutEngine.layout(tree);
 		tree.normalizeX();
@@ -76,6 +73,26 @@ public class TreeElement
 		width = b.width;
 		height = b.height;
 	}
+
+	/**
+	 * Render a new Tree, with default values for hgap, vgap, and zoom.
+	 */
+	public void render(Tree tree) {
+		// Here are the default values for hgap, vgap, and zoom:
+		render(tree, HGAP_DEFAULT, VGAP_DEFAULT, ZOOM_DEFAULT);
+	}
+
+	/**
+	 * Render a new Tree, with different values for the gaps and the zoom.
+	 */
+	public void render(Tree tree, double hgap, double vgap, double zoom) {
+		this.tree = tree;
+		this.hgap = hgap;
+		this.vgap = vgap;
+		this.zoom = zoom;
+		render();
+	}
+
 
 	public void setScrollBars() {
 		Rectangle r = getClientArea();
@@ -176,7 +193,6 @@ public class TreeElement
 		e.gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		e.gc.fillRectangle(r);
 		e.gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
-		rand = new Random(SEED);
 		paintTree(tree, e.gc, r);
 	}
 
@@ -216,10 +232,10 @@ public class TreeElement
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.keyCode == 'z') {
-			reinit();
+			z_handler.execute(this);
 		} 
 		else if (e.keyCode == 'a') {
-			doLayout();
+			render();
 		} 
 		else if (e.keyCode == 'p') {
 			tree.print();
@@ -232,6 +248,4 @@ public class TreeElement
 	@Override
 	public void keyReleased(KeyEvent e) {
 	}
-
-
 }
