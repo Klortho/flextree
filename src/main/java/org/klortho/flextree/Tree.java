@@ -118,14 +118,6 @@ public final class Tree {
 		return res;
 	}
 	
-	public void addSize(double hsize, double vsize) {
-		this.width += hsize;
-		this.height += vsize;
-		for (Tree child : children) {
-			child.addSize(hsize, vsize);
-		}
-	}
-	
 	/**
 	 * Print out the Tree in Java format.
 	 */

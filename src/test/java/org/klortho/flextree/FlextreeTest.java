@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import org.klortho.flextree.LayoutEngine.WrappedTree;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -143,15 +145,10 @@ public class FlextreeTest extends TestCase {
 	}
 
 	public void layoutAndCheckTree(Tree t) {
-    	//t.addGap(10, 10);  // FIXME: what does this do?
-    	
     	// FIXME: after you get the test written, refactor to move this stuff into
     	// the LayoutEngine's layout method:
     	t.layer();
-    	Marshall m = new Marshall();
-    	Object converted = m.convert(t);
-    	m.runOnConverted(converted);
-    	m.convertBack(converted, t);
+    	LayoutEngine.layout(t);
     	t.normalizeX();  // FIXME: what does this do?
     	
     	assertFalse(overlap(t));

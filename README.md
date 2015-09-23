@@ -30,8 +30,9 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 
 
-* For each of the "after" trees in the test: view them in SWT, and visually check them.
+* [c] For each of the "after" trees in the test: view them in SWT, and visually check them.
 
+* Make a couple more test cases: from the papers, and the trouble one from dtd-diagram
 
 
 * My main program will have these features:

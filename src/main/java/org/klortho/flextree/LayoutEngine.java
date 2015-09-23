@@ -1,5 +1,7 @@
 package org.klortho.flextree;
 
+import org.klortho.flextree.LayoutEngine.WrappedTree;
+
 /* The extended Reingold-Tilford algorithm as described in the paper
  * "Drawing Non-layered Tidy Trees in Linear Time" by Atze van der Ploeg
  * Accepted for publication in Software: Practice and Experience, to Appear.
@@ -10,22 +12,69 @@ package org.klortho.flextree;
 
 public class LayoutEngine {
 	public static class WrappedTree {
-	    double w, h;          // Width and height.
-	    double x, y, prelim, mod, shift, change;
+	    Tree t;
+	    double prelim, mod, shift, change;
 	    WrappedTree tl, tr;          // Left and right thread.                        
 	    WrappedTree el, er;          // Extreme left and right nodes. 
 	    double msel, mser;    // Sum of modifiers at the extreme nodes. 
 	    WrappedTree[] c; int cs;     // Array of children and number of children. 
 	   
-	    WrappedTree(double w, double h, double y,WrappedTree... c) {
-	        this.w = w; this.h = h; this.y = y; this.c = c; 
+	    WrappedTree(Tree t, double y, WrappedTree... c) {
+	    	this.t = t;
+	        this.c = c; 
 	        this.cs = c.length;
 	    }
+
+        public double width() {
+            return t.width;
+        }
+        public double height() {
+            return t.height;
+        }
+        public double x() {
+        	return t.x;
+        }
+        public void x(double _x) {
+            t.x = _x;
+        }
+        public double y() {
+            return t.y;
+        }
+        public void y(double _y) {
+            t.y = _y;
+        }
     }
-	static void layout(WrappedTree t) { 
-		firstWalk(t); secondWalk(t,0); 
+
+	
+	public static void layout(Tree t) { 
+		WrappedTree wrapped = wrapTree(t);
+		firstWalk(wrapped); 
+		secondWalk(wrapped, 0); 
+		
+		convertBack(wrapped, t);
 	}
 		   
+	
+	
+    static WrappedTree wrapTree(Tree n) {
+		if (n == null) return null;
+		WrappedTree[] children = new WrappedTree[n.children.size()];
+		for (int i = 0 ; i < children.length ; i++) {
+			children[i] = (WrappedTree) wrapTree(n.children.get(i));
+		}
+		return new WrappedTree(n, n.y, children);
+	}
+
+
+	public static void convertBack(Object converted, Tree root) {
+		WrappedTree conv = (WrappedTree) converted;
+		root.x = conv.x();
+		for (int i = 0 ; i < conv.c.length ; i++) {
+			convertBack(conv.c[i], root.children.get(i));
+		}
+		
+	}
+
 	static  void firstWalk(WrappedTree t) {
 	  if(t.cs == 0){ setExtremes(t); return; }
 	  firstWalk(t.c[0]);
@@ -60,7 +109,7 @@ public class LayoutEngine {
 	   while(sr != null && cl != null){
 	      if(bottom(sr) > ih.lowY) ih = ih.nxt;                                
 	      // How far to the left of the right side of sr is the left side of cl?  
-	      double dist = (mssr + sr.prelim + sr.w) - (mscl + cl.prelim);
+	      double dist = (mssr + sr.prelim + sr.width()) - (mscl + cl.prelim);
 	      if(dist > 0){
 	         mscl+=dist;
 	         moveSubtree(t,i,ih.index,dist);
@@ -91,7 +140,7 @@ public class LayoutEngine {
 	  
 	static WrappedTree nextLeftContour(WrappedTree t) {return t.cs==0 ? t.tl : t.c[0];}
 	static WrappedTree nextRightContour(WrappedTree t){return t.cs==0 ? t.tr : t.c[t.cs-1];} 
-	static double bottom(WrappedTree t) { return t.y + t.h;  }
+	static double bottom(WrappedTree t) { return t.y() + t.height(); }
 	  
 	static void setLeftThread(WrappedTree t, int i, WrappedTree cl, double modsumcl) {
 	   WrappedTree li = t.c[0].el;
@@ -118,13 +167,13 @@ public class LayoutEngine {
 	static void positionRoot(WrappedTree t) {
 	   // Position root between children, taking into account their mod.  
 	   t.prelim = (t.c[0].prelim + t.c[0].mod + t.c[t.cs-1].mod + 
-	               t.c[t.cs-1].prelim +  t.c[t.cs-1].w)/2 - t.w/2;
+	               t.c[t.cs-1].prelim +  t.c[t.cs-1].width())/2 - t.width()/2;
 	}
 	  
 	static void secondWalk(WrappedTree t, double modsum) {
 	   modsum+=t.mod;
 	   // Set absolute (non-relative) horizontal coordinate.  
-	   t.x = t.prelim + modsum;
+	   t.x(t.prelim + modsum);
 	   addChildSpacing(t);                                               
 	   for(int i = 0 ; i < t.cs ; i++) secondWalk(t.c[i],modsum);
 	}

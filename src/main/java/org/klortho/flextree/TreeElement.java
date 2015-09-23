@@ -1,5 +1,4 @@
 package org.klortho.flextree;
-import java.io.File;
 import java.util.Random;
 
 import org.eclipse.swt.SWT;
@@ -18,6 +17,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.klortho.flextree.LayoutEngine.WrappedTree;
 
 
 /**
@@ -57,17 +57,20 @@ public class TreeElement
 		hgap = vgap = 10;
 		tree = gen.randomTree();
 		//try {
-    	//	tree = Tree.fromJson(new File("src/test/resources/after-1.json"));
+    	//	tree = Tree.fromJson(new File("src/test/resources/before-6.json"));
 		//} 
 		//catch (Exception e) {}
 		doLayout();
+		//try {
+	    //    PrintStream after = new PrintStream("after.json");
+	    //    after.print(tree.toJson());
+	    //    after.close();                
+		//} catch (Exception e) {}
 	}
 
 	public void doLayout() {
 		tree.layer();
-		Object converted = m.convert(tree);
-		m.runOnConverted(converted);
-		m.convertBack(converted, tree);
+		LayoutEngine.layout(tree);
 		tree.normalizeX();
 		BoundingBox b = tree.getBoundingBox();
 		width = b.width;

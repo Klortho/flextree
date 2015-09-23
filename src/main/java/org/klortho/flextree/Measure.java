@@ -1,5 +1,7 @@
 package org.klortho.flextree;
 
+import org.klortho.flextree.LayoutEngine.WrappedTree;
+
 public class Measure {
 
 	public static int MAX_SIZE = 10000;
@@ -10,10 +12,8 @@ public class Measure {
 	
 	static long timeLayout(Tree tree){
 		System.gc();
-		Marshall m = new Marshall();
-		Object converted = m.convert(tree);
 		long start = System.nanoTime();
-		m.runOnConverted(converted);
+		LayoutEngine.layout(tree);
 		long now = System.nanoTime();
 		return now - start;
 	}
