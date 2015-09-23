@@ -184,7 +184,6 @@ public class FlextreeTest extends TestCase {
     {
         try {
             for (int test_num = 1; test_num <= 5; ++test_num) {
-            	System.out.println("f = ");
             	File f = getFile("before-" + test_num + ".json");
                 Tree tree = Tree.fromJson(getFile("before-" + test_num + ".json"));
                 tree.print();

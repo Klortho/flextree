@@ -20,15 +20,19 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 # To do
 
-* Implement my unit test again, that takes canned input from JSON files, and compares
+* [c] Implement my unit test again, that takes canned input from JSON files, and compares
   the layout results with after-trees, also from JSON.
     * [c] Also test the result to make sure there are no overlaps.
+
+* Get rid of addGap in the SWT test -- instead, subtract from width/height when drawing
+  the boxes.
+
+
+
 
 * For each of the "after" trees in the test: view them in SWT, and visually check them.
 
 
-* Get rid of addGap in the SWT test -- instead, subtract from width/height when drawing
-  the boxes.
 
 * My main program will have these features:
     * Input: 

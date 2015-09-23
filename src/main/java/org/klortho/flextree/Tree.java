@@ -12,13 +12,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-@JsonIgnoreProperties({ "boundingBox", "minX", "depth", "hgap", "vgap" })
+@JsonIgnoreProperties({ "boundingBox", "minX", "depth" })
 public final class Tree {
-	// input
 	public double width, height;
 	public Vector<Tree> children;
-	public double hgap, vgap;
-	// output
 	public double x, y;
 
     public static ObjectMapper json_mapper;
@@ -60,55 +57,55 @@ public final class Tree {
     }
 
 
-	public BoundingBox getBoundingBox(){
+	public BoundingBox getBoundingBox() {
 		BoundingBox result = new BoundingBox(0, 0);
-		getBoundingBox(this,result);
+		getBoundingBox(this, result);
 		return result;
 	}
 	
-	private static void getBoundingBox(Tree tree,BoundingBox b) {
-		b.width = Math.max(b.width,tree.x + tree.width);
-		b.height = Math.max(b.height,tree.y + tree.height);
-		for(Tree child : tree.children){
+	private static void getBoundingBox(Tree tree, BoundingBox b) {
+		b.width = Math.max(b.width, tree.x + tree.width);
+		b.height = Math.max(b.height, tree.y + tree.height);
+		for (Tree child : tree.children) {
 			getBoundingBox(child, b);
 		}
 	}
 	
-	public void moveRight(double move){
+	public void moveRight(double move) {
 		x += move;
-		for(Tree child : children){
+		for (Tree child : children) {
 			child.moveRight(move);
 		}
 	}
 	
-	public void normalizeX(){
+	public void normalizeX() {
 		double minX = getMinX();
 		moveRight(-minX);
 	}
 	
-	public double getMinX(){
+	public double getMinX() {
 		double res = x;
-		for(Tree child : children){
-			res = Math.min(child.getMinX(),res);
+		for (Tree child : children) {
+			res = Math.min(child.getMinX(), res);
 		}
 		return res;
 	}
 	
-	public int size(){
+	public int size() {
 		int res = 1;
-		for(Tree node : children){
+		for (Tree node : children) {
 			res += node.size();
 		}
 		return res;
 	}
 	
-	public boolean hasChildren(){
+	public boolean hasChildren() {
 		return children.size() > 0;
 	}
 	
 	public void allNodes(ArrayList<Tree> nodes) {
 		nodes.add(this);
-		for(Tree node : children){
+		for (Tree node : children) {
 			node.allNodes(nodes);
 		}
 	}
@@ -121,38 +118,22 @@ public final class Tree {
 		return res;
 	}
 	
-	public void addGap(double hgap, double vgap) {
-		this.hgap += hgap;
-		this.vgap += vgap;
-		this.width += 2 * hgap;
-		this.height += 2 * vgap;
-		for (Tree child : children) {
-			child.addGap(hgap, vgap);
-		}
-	}
-	
 	public void addSize(double hsize, double vsize) {
-		this.width+=hsize;
-		this.height+=vsize;
-		for(Tree child : children){
+		this.width += hsize;
+		this.height += vsize;
+		for (Tree child : children) {
 			child.addSize(hsize, vsize);
 		}
 	}
 	
-	public void addGapPerDepth(int gapPerDepth, int depth,int maxDepth){
-		this.hgap += (maxDepth-depth)*gapPerDepth;
-		this.width+=2* (maxDepth-depth)*gapPerDepth;
-		for(Tree child : children){
-			child.addGapPerDepth(gapPerDepth,depth+1,maxDepth);
-		}
-	}
-	
+	/**
+	 * Print out the Tree in Java format.
+	 */
 	public void print() {
 		print(0);
 	}
 
 	private void print(int indent) {
-		//System.out.print("[" + indent + "]");
 		String istr = "";
 		for (int i = 0; i < indent; ++i) istr += "  ";
 		System.out.printf(istr + "new Tree(%f, %f", width, height);
@@ -167,7 +148,7 @@ public final class Tree {
 	public void mul(double w, double h){
 		width *= w;
 		height *= h;
-		for(Tree child : children){
+		for (Tree child : children) {
 			child.mul(w, h);
 		}
 	}
@@ -180,12 +161,13 @@ public final class Tree {
 	
 	public void layer(double d){
 		y = d;
-		d+=height;
-		for(Tree child : children){
+		d += height;
+		for (Tree child : children) {
 			child.layer(d);
 		}
 	}
 	
+	// FIXME: move this to RandomTreeGenerator
 	public void randExpand(Tree t, Random r) {
 		t.y += height;
 		int i = r.nextInt(children.size() + 1);
@@ -197,7 +179,7 @@ public final class Tree {
 		}
 	}
 	
-	public void addKid(Tree t){
+	public void addKid(Tree t) {
 		children.add(t);
 	}
 
