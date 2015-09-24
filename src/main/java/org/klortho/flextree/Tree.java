@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 import java.util.Vector;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -71,26 +70,6 @@ public final class Tree {
 		}
 	}
 	
-	public void moveRight(double move) {
-		x += move;
-		for (Tree child : children) {
-			child.moveRight(move);
-		}
-	}
-	
-	public void normalizeX() {
-		double minX = getMinX();
-		moveRight(-minX);
-	}
-	
-	public double getMinX() {
-		double res = x;
-		for (Tree child : children) {
-			res = Math.min(child.getMinX(), res);
-		}
-		return res;
-	}
-	
 	public int size() {
 		int res = 1;
 		for (Tree node : children) {
@@ -145,22 +124,6 @@ public final class Tree {
 		}
 	}
 	
-	// FIXME: move this to RandomTreeGenerator
-	public void randExpand(Tree t, Random r) {
-		t.y += height;
-		int i = r.nextInt(children.size() + 1);
-		if (i == children.size()){
-			addKid(t);
-		} 
-		else {
-			children.get(i).randExpand( t, r);
-		}
-	}
-	
-	public void addKid(Tree t) {
-		children.add(t);
-	}
-
 	/**
 	 * Compare two trees in terms of the size and positions of their nodes
 	 */

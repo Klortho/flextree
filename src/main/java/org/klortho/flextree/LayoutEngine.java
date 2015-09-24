@@ -1,14 +1,15 @@
 package org.klortho.flextree;
 
-import org.eclipse.swt.graphics.RGB;
-import org.klortho.flextree.TreeSWT.WrappedTree;
-
-/* The extended Reingold-Tilford algorithm as described in the paper
+/**
+ * The extended Reingold-Tilford algorithm as described in the paper
  * "Drawing Non-layered Tidy Trees in Linear Time" by Atze van der Ploeg
  * Accepted for publication in Software: Practice and Experience, to Appear.
  * 
  * This code is in the public domain, use it any way you wish. A reference to the paper is 
  * appreciated!
+ * 
+ * This LayoutEngine sets the x and y coordinates for every node in the tree such that:
+ * - minimum x and minimum y are both 0.
  */
 
 public class LayoutEngine {
@@ -22,9 +23,10 @@ public class LayoutEngine {
         zerothWalk(wt);
         
 		firstWalk(wt); 
-		secondWalk(wt, 0); 
+		secondWalk(wt, 0);
+		normalizeX(wt);
 	}
-		   
+	
 	
 	private static class WrappedTree {
 	    Tree t;
@@ -85,6 +87,7 @@ public class LayoutEngine {
         
         // Create siblings in contour minimal vertical coordinate and index list.
 	    IYL ih =  updateIYL(bottom(t.children[0].el), 0, null);
+	    
 	    for (int i = 1; i < t.num_children; i++) {
 	        firstWalk(t.children[i]);
 	        
@@ -92,7 +95,7 @@ public class LayoutEngine {
 	        // current subtree.
 	        double minY = bottom(t.children[i].er);                                
 	        seperate(t, i, ih);
-	        ih = updateIYL(minY,i,ih);                                     
+	        ih = updateIYL(minY, i, ih);                                     
 	    }
         positionRoot(t);
         setExtremes(t);
@@ -113,15 +116,15 @@ public class LayoutEngine {
 	}
 	  
 	static void seperate(WrappedTree t, int i, IYL ih) {
-	   // Right contour node of left siblings and its sum of modfiers.  
-	   WrappedTree sr = t.children[i-1]; 
-	   double mssr = sr.mod;
+	    // Right contour node of left siblings and its sum of modfiers.  
+	    WrappedTree sr = t.children[i-1]; 
+	    double mssr = sr.mod;
 	   
-	   // Left contour node of current subtree and its sum of modfiers.  
-	   WrappedTree cl = t.children[i]; 
-	   double mscl = cl.mod;
+	    // Left contour node of current subtree and its sum of modfiers.  
+	    WrappedTree cl = t.children[i]; 
+	    double mscl = cl.mod;
 	   
-	   while (sr != null && cl != null) {
+	    while (sr != null && cl != null) {
 		    if (bottom(sr) > ih.lowY) ih = ih.nxt;
 		  
 		    // How far to the left of the right side of sr is the left side of cl?  
@@ -208,7 +211,7 @@ public class LayoutEngine {
                       wt.children[wt.num_children - 1].width() ) / 2 
 			        - wt.width() / 2;
 	}
-	  
+
 	static void secondWalk(WrappedTree t, double modsum) {
 	    modsum += t.mod;
 	    // Set absolute (non-relative) horizontal coordinate.  
@@ -238,8 +241,10 @@ public class LayoutEngine {
 	}                                                                    
 
 	// A linked list of the indexes of left siblings and their lowest vertical coordinate.  
-	static class IYL{                                                          
-	    double lowY; int index; IYL nxt;                                 
+	static class IYL {                                                          
+	    double lowY; 
+	    int index; 
+	    IYL nxt;                                 
 	    public IYL(double lowY, int index, IYL nxt) {                         
 	        this.lowY = lowY; 
 	        this.index = index; 
@@ -253,4 +258,28 @@ public class LayoutEngine {
 	    // Prepend the new subtree.  
 	    return new IYL(minY, i, ih);                                       
 	}         
+
+	/**
+	 * Normalize the x-coordinate, so that the minimum x is 0.
+	 */
+	static void normalizeX(WrappedTree wt) {
+		double minX = getMinX(wt);
+		System.out.println("minX = " + minX);
+		moveRight(wt, -minX);
+	}
+
+	static double getMinX(WrappedTree wt) {
+		double minX = wt.x();
+		for (WrappedTree child : wt.children) {
+			minX = Math.min(getMinX(child), minX);
+		}
+		return minX;
+	}
+	
+	static public void moveRight(WrappedTree wt, double move) {
+		wt.x(wt.x() + move);
+		for (WrappedTree child : wt.children) {
+			moveRight(child, move);
+		}
+	}
 }

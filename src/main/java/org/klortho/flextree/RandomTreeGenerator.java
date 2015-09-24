@@ -43,18 +43,29 @@ public class RandomTreeGenerator {
 	public Tree randomTree() {
 		Tree root = randomNode();
 		for (int i = 0 ; i < numNodes - 1 ; i++) {
-			root.randExpand(randomNode(), rand);
+			randExpand(root, randomNode());
 		}
 		return root;		
 	}
-	
+
 	private Tree randomNode() {
 		return new Tree(getRandomInRange(minWidth, maxWidth),
 			            getRandomInRange(minHeight, maxHeight));		
 	}
-	
-	private double getRandomInRange(double start, double end){
+
+	// Insert the new node into a random place within this subtree
+	private void randExpand(Tree start, Tree newNode) {
+		int i = rand.nextInt(start.children.size() + 1);
+		if (i == start.children.size()) {
+			start.children.add(newNode);
+		} 
+		else {
+			randExpand(start.children.get(i), newNode);
+		}
+	}
+
+	private double getRandomInRange(double start, double end) {
 		double r = rand.nextDouble();
-		return Math.rint((start + r * (end - start)) * 2)/2;
+		return Math.rint((start + r * (end - start)) * 2) / 2;
 	}
 }

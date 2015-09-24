@@ -1,6 +1,5 @@
 package org.klortho.flextree;
 import java.util.Random;
-import java.util.Vector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -108,8 +107,6 @@ public class TreeSWT
 	private void render() {
 		// FIXME: this class shouldn't be doing the layout.
 		LayoutEngine.layout(t);
-		// FIXME: what does this do?
-		t.normalizeX();
 		BoundingBox b = t.getBoundingBox();
 		width = b.width;
 		height = b.height;
@@ -208,7 +205,6 @@ public class TreeSWT
 
 	@Override
 	public void paintControl(PaintEvent e) {
-		System.out.println("paintControl");
 		e.gc.setAdvanced(true);
 		Rectangle r = getClientArea();
 		e.gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
