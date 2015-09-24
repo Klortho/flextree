@@ -20,8 +20,8 @@ public class Flextree {
 		// The following function is used to handle when the user presses the `z` key in
 		// the tree display. It generates a new random tree and re-renders.
 		KeyHandler z_handler = new KeyHandler() {
-			public void execute(TreeSWT swt) { 
-				swt.render(gen.randomTree());
+			public void execute(RenderSWT r) { 
+				r.rerender(gen.randomTree());
 			}
 		};
 		RenderSWT.render(tree, z_handler);

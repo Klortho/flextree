@@ -16,7 +16,6 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 # To do
 
-* Turn Tree into an interface.  All the WrappedTrees implement that interface.
 
 * Finish working on the RenderSWT/TreeSWT interface:
     * All the API should be moved to RenderSWT, including what's needed inside
@@ -25,6 +24,9 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
     * hgap, vgap, and zoom should, by default, be determined dynamically, if
       it is easy.
 
+
+
+* Turn Tree into an interface.  All the WrappedTrees implement that interface.
 
 
 * My main program will have these features:

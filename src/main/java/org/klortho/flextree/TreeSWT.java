@@ -33,6 +33,7 @@ public class TreeSWT
   extends Composite 
   implements SelectionListener, PaintListener, ControlListener , Listener, KeyListener
 {
+	RenderSWT parent;
 	Tree tree;
 	WrappedTree wt;
 	
@@ -53,6 +54,7 @@ public class TreeSWT
 	
 	public TreeSWT(Composite parent, Tree tree, KeyHandler z_handler) {
 		super(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		this.parent = (RenderSWT) parent;
 		this.tree = tree;
 		this.z_handler = z_handler;
 
@@ -262,7 +264,7 @@ public class TreeSWT
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.keyCode == 'z') {
-			z_handler.execute(this);
+			z_handler.execute(parent);
 		} 
 		else if (e.keyCode == 'a') {
 			render();
