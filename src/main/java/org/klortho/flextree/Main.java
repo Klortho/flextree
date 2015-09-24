@@ -2,6 +2,7 @@ package org.klortho.flextree;
 
 import java.io.File;
 
+import org.klortho.flextree.LayoutEngine.Separation;
 import org.klortho.flextree.RenderSWT.KeyHandler;
 
 public class Main {
@@ -16,17 +17,28 @@ public class Main {
 		try {
             t = Tree.fromJson(new File("src/test/resources/before-6.json"));
 		} catch(Exception e) {}
-		LayoutEngine.layout(t);
+		layout(t);
 
 		// The following function is used to handle when the user presses the `z` key in
 		// the tree display. It generates a new random tree and re-renders.
 		KeyHandler z_handler = new KeyHandler() {
 			public void execute(RenderSWT r) {
 				Tree t = gen.randomTree();
-				LayoutEngine.layout(t);;
+				layout(t);
 				r.rerender(t);
 			}
 		};
+		
 		RenderSWT.render(t, z_handler);
+	}
+	
+	static void layout(Tree t) {
+		Separation separation = new Separation() {
+			public double s(Tree a, Tree b) {
+				//return a.parent == b.parent ? 0 : 1;
+				return 1;
+			}
+		};
+		LayoutEngine.layout(t, separation);
 	}
 }

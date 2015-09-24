@@ -15,6 +15,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public final class Tree {
 	public double width, height;
 	public Vector<Tree> children;
+	
+	// Set by the layout engine:
+	public Tree parent;
+	public int depth;
 	public double x, y;
 
     public static ObjectMapper json_mapper;
@@ -23,6 +27,9 @@ public final class Tree {
         json_mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
+    // Sentinal value used for the parent of the root
+    public static Tree NULL = new Tree();
+    
     /**
      * Default constructor is needed by Jackson, to enable reading in
      * objects from JSON.
@@ -31,6 +38,7 @@ public final class Tree {
         this.width = 1.0;
         this.height = 1.0;
         this.children = new Vector<Tree>();
+        this.parent = NULL;
         this.x = 0;
         this.y = 0;
     }
@@ -40,6 +48,7 @@ public final class Tree {
 		this.height = height;
 		this.children = new Vector<Tree>();
 		this.children.addAll(Arrays.asList(children));
+        this.parent = NULL;
 	}
 
     // Create a tree from a JSON file

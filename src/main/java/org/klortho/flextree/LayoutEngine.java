@@ -13,17 +13,32 @@ package org.klortho.flextree;
  */
 
 public class LayoutEngine {
+	// Set default separation
+	static Separation separation = new Separation() {
+		public double s(Tree a, Tree b) {
+			//return a.parent == b.parent ? 0 : 1;
+			return 1;
+		}
+	};
 	
 	public static void layout(Tree t) { 
 		WrappedTree wt = new WrappedTree(t);
-
-        setY(wt, 0);
+        zerothWalk(wt, 0);
 		firstWalk(wt); 
 		secondWalk(wt, 0);
 		normalizeX(wt);
 	}
-	
-	
+
+	// Interface to use for the separation
+	public interface Separation {
+		abstract double s(Tree a, Tree b);
+	}
+
+	public static void layout(Tree t, Separation s) {
+		separation = s;
+		layout(t);
+	}
+
 	private static class WrappedTree {
 	    Tree t;
 	    WrappedTree[] children; 
@@ -50,6 +65,15 @@ public class LayoutEngine {
         public double height() {
             return t.height;
         }
+        public void parent(Tree p) {
+        	t.parent = p;
+        }
+        public int depth() {
+        	return t.depth;
+        }
+        public void depth(int d) {
+        	t.depth = d;
+        }
         public double x() {
         	return t.x;
         }
@@ -65,17 +89,23 @@ public class LayoutEngine {
     }
 
     // Recursively set the y coordinate of the children, based on
-    // the y coordinate of the parent, and its height
-	static void setY(WrappedTree wt, double initial) {
+    // the y coordinate of the parent, and its height. Also set parent and
+	// depth.
+	static void zerothWalk(WrappedTree wt, double initial) {
 		wt.y(initial);
-		setY(wt);
+		wt.depth(0);
+		zerothWalk(wt);
 	}
 	
-    static void setY(WrappedTree wt) {
+    static void zerothWalk(WrappedTree wt) {
         double kid_y = wt.y() + wt.height();
+        int kid_depth = wt.depth() + 1;
         for (int i = 0; i < wt.num_children; ++i) {
-            wt.children[i].y(kid_y);
-            setY(wt.children[i]);
+        	WrappedTree kid = wt.children[i];
+            kid.y(kid_y);
+            kid.parent(wt.t);
+            kid.depth(kid_depth);
+            zerothWalk(wt.children[i]);
         }
     }
 
