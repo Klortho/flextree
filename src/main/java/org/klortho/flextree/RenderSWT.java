@@ -71,7 +71,7 @@ public class RenderSWT extends Composite {
 		final Shell shell = new Shell(display, SWT.SHELL_TRIM);
 		shell.setLayout(new FillLayout());
 		shell.setSize(1000, 800);
-		RenderSWT r = new RenderSWT(shell, tree, z_handler);
+		RenderSWT r = new RenderSWT(shell, tree, z_handler, hgap, vgap, zoom);
 		shell.pack();
 		shell.open();
 		while (!shell.isDisposed ()) {
@@ -86,14 +86,15 @@ public class RenderSWT extends Composite {
 	 * Rerender a new tree in the same display.
 	 */
 	public void rerender(Tree tree) {
-		treeSWT.render(tree);
+		treeSWT.rerender(tree);
 	}
 
 	// Constructor is private -- instances must be created by one of the 
-	private RenderSWT(Composite parent, Tree tree, KeyHandler z_handler) {
+	private RenderSWT(Composite parent, Tree tree, KeyHandler z_handler,
+			double hgap, double vgap, double zoom) {
 		super(parent, SWT.NONE);
 		setLayout(new FillLayout(SWT.VERTICAL));
-		treeSWT = new TreeSWT(this, tree, z_handler);
+		treeSWT = new TreeSWT(this, tree, z_handler, hgap, vgap, zoom);
 	}
 
 

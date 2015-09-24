@@ -42,21 +42,21 @@ public class TreeSWT
 	static int SEED = 43;
 	Random rand = new Random(SEED);
 
-	static final double HGAP_DEFAULT = 10.0;
-	static final double VGAP_DEFAULT = 10.0;
-	static final double ZOOM_DEFAULT = 1.0;
-
-	double hgap = HGAP_DEFAULT;
-	double vgap = VGAP_DEFAULT;
-	double zoom = ZOOM_DEFAULT;
+	double hgap;
+	double vgap;
+	double zoom;
 
 	KeyHandler z_handler; 
 	
-	public TreeSWT(Composite parent, Tree tree, KeyHandler z_handler) {
+	public TreeSWT(Composite parent, Tree tree, KeyHandler z_handler,
+			double hgap, double vgap, double zoom) {
 		super(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		this.parent = (RenderSWT) parent;
 		this.tree = tree;
 		this.z_handler = z_handler;
+		this.hgap = hgap;
+		this.vgap = vgap;
+		this.zoom = zoom;
 
 		render();
 		addPaintListener(this);
@@ -66,6 +66,16 @@ public class TreeSWT
 		addKeyListener(this);
 		addListener(SWT.MouseVerticalWheel, this);
 	}
+
+	/**
+	 * Re-render, with a new tree.
+	 */
+	public void rerender(Tree tree) {
+		this.tree = tree;
+		render();
+	}
+
+
 
 	// This class wraps each node of the tree, storing the color that will be
 	// used to render the rectangle
@@ -92,7 +102,8 @@ public class TreeSWT
 	}
 	
 	/**
-	 * Render the Tree that was passed in from the constructor.
+	 * Render the Tree. This is called both from the constructor and from the
+	 * rerender() method.
 	 */
 	private void render() {
 		// FIXME: what does this do?
@@ -107,26 +118,6 @@ public class TreeSWT
 		
 		wt = new WrappedTree(tree);
 	}
-
-	/**
-	 * Render a new Tree, with default values for hgap, vgap, and zoom.
-	 */
-	public void render(Tree tree) {
-		// Here are the default values for hgap, vgap, and zoom:
-		render(tree, HGAP_DEFAULT, VGAP_DEFAULT, ZOOM_DEFAULT);
-	}
-
-	/**
-	 * Render a new Tree, with different values for the gaps and the zoom.
-	 */
-	public void render(Tree tree, double hgap, double vgap, double zoom) {
-		this.tree = tree;
-		this.hgap = hgap;
-		this.vgap = vgap;
-		this.zoom = zoom;
-		render();
-	}
-
 
 	public void setScrollBars() {
 		Rectangle r = getClientArea();
