@@ -21,8 +21,7 @@ public class Flextree {
 		// the tree display. It generates a new random tree and re-renders.
 		KeyHandler z_handler = new KeyHandler() {
 			public void execute(TreeSWT swt) { 
-				swt.tree = gen.randomTree();
-				swt.render();
+				swt.render(gen.randomTree());
 			}
 		};
 		RenderSWT.render(tree, z_handler);

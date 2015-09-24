@@ -1,7 +1,5 @@
 package org.klortho.flextree;
 
-import org.klortho.flextree.LayoutEngine.WrappedTree;
-
 public class Measure {
 
 	public static int MAX_SIZE = 10000;
@@ -10,7 +8,7 @@ public class Measure {
 	public static int NR_WARMUP = 100;
 	public static long SEED = 42;
 	
-	static long timeLayout(Tree tree){
+	static long timeLayout(Tree tree) {
 		System.gc();
 		long start = System.nanoTime();
 		LayoutEngine.layout(tree);
@@ -19,7 +17,7 @@ public class Measure {
 	}
 
 	static long runTests(RandomTreeGenerator gen,  int nrTests) {
-		for(int i = 0 ; i < nrTests * gen.numNodes ; i++){
+		for(int i = 0 ; i < nrTests * gen.numNodes ; i++) {
 			Tree tree = gen.randomTree();
 			long res = timeLayout(tree);
 			System.out.printf("%d %d\n",gen.numNodes,res);
@@ -27,8 +25,8 @@ public class Measure {
 		return 0;
 	}
 	
-	static void measureArbitrarilySized(){
-		for (int i = 1; i < MAX_SIZE; i+= INCREMENT){
+	static void measureArbitrarilySized() {
+		for (int i = 1; i < MAX_SIZE; i+= INCREMENT) {
 			RandomTreeGenerator gen = new RandomTreeGenerator(i, 1, 10,1, 10, 5000);
 			runTests(gen, NR_TESTS);
 		}

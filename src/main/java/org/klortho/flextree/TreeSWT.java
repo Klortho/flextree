@@ -1,5 +1,6 @@
 package org.klortho.flextree;
 import java.util.Random;
+import java.util.Vector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -22,6 +23,10 @@ import org.klortho.flextree.RenderSWT.KeyHandler;
 
 /**
  * This class is managed by RenderSWT -- you shouldn't need to access it directly.
+ * 
+ * Construct this with an already-layed out (FIXME: right now, this class does the layout)
+ * tree. You can update the display with a new tree at any time, by calling the render()
+ * method.
  */
 
 public class TreeSWT 
@@ -29,6 +34,7 @@ public class TreeSWT
   implements SelectionListener, PaintListener, ControlListener , Listener, KeyListener
 {
 	Tree tree;
+	WrappedTree wt;
 	
 	double xOffset, yOffset;
 	double width, height;
@@ -47,33 +53,57 @@ public class TreeSWT
 	
 	public TreeSWT(Composite parent, Tree tree, KeyHandler z_handler) {
 		super(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		this.z_handler = z_handler;
-		init(tree);
-	}
-	
-	private void init(Tree tree) {
 		this.tree = tree;
+		this.z_handler = z_handler;
+
+		render();
 		addPaintListener(this);
 		getHorizontalBar().addSelectionListener(this);
 		getVerticalBar().addSelectionListener(this);
 		addControlListener(this);	
 		addKeyListener(this);
 		addListener(SWT.MouseVerticalWheel, this);
-		render();
+	}
+
+	// This class wraps each node of the tree, storing the color that will be
+	// used to render the rectangle
+	class WrappedTree {
+		Tree tree;
+		RGB rgb;
+        WrappedTree[] children;
+
+		public WrappedTree(Tree tree) {
+			this.tree = tree;
+			rgb = new RGB((int) ((rand.nextDouble() * 150)), 
+					      (int) ((rand.nextDouble() * 150)), 
+					      (int) ((rand.nextDouble() * 150)));
+
+		    children = new WrappedTree[tree.children.size()];
+		    for (int i = 0 ; i < children.length ; i++) {
+                children[i] = new WrappedTree(tree.children.get(i));
+	        }
+		}
+		public double x() { return tree.x; }
+		public double y() { return tree.y; }
+		public double width() { return tree.width; }
+		public double height() { return tree.height; }
 	}
 	
 	/**
 	 * Render the Tree that was passed in from the constructor.
 	 */
-	public void render() {
+	private void render() {
 		// FIXME: what does this do?
 		tree.layer();
+		// FIXME: this class shouldn't be doing the layout.
 		LayoutEngine.layout(tree);
 		// FIXME: what does this do?
 		tree.normalizeX();
 		BoundingBox b = tree.getBoundingBox();
 		width = b.width;
 		height = b.height;
+		
+		wt = new WrappedTree(tree);
 	}
 
 	/**
@@ -139,35 +169,32 @@ public class TreeSWT
 	public void widgetDefaultSelected(SelectionEvent e) {	
 	}
 	
-	void paintTree(Tree root, GC gc, Rectangle r) {
-		Color c = new Color(gc.getDevice(), 
-				new RGB((int) ((rand.nextDouble() * 150)), 
-						(int) ((rand.nextDouble() * 150)), 
-						(int) ((rand.nextDouble() * 150))));
+	void paintTree(WrappedTree wt, GC gc, Rectangle r) {
+		Color c = new Color(gc.getDevice(), wt.rgb);
 		gc.setBackground(c);
-		gc.fillRectangle(roundInt(zoom * (root.x + hgap / 2 - xOffset)), 
-				         roundInt(zoom * (root.y + vgap / 2 - yOffset)), 
-				         roundInt(zoom * (root.width - hgap)), 
-				         roundInt(zoom * (root.height - vgap)));
+		gc.fillRectangle(roundInt(zoom * (wt.x() + hgap / 2 - xOffset)), 
+				         roundInt(zoom * (wt.y() + vgap / 2 - yOffset)), 
+				         roundInt(zoom * (wt.width() - hgap)), 
+				         roundInt(zoom * (wt.height() - vgap)));
 		gc.setAlpha(255);
-		gc.drawRectangle(roundInt(zoom * (root.x + hgap / 2 - xOffset)), 
-				         roundInt(zoom * (root.y + vgap / 2 - yOffset)), 
-				         roundInt(zoom * (root.width - hgap)), 
-				         roundInt(zoom * (root.height - vgap)));
+		gc.drawRectangle(roundInt(zoom * (wt.x() + hgap / 2 - xOffset)), 
+				         roundInt(zoom * (wt.y() + vgap / 2 - yOffset)), 
+				         roundInt(zoom * (wt.width() - hgap)), 
+				         roundInt(zoom * (wt.height() - vgap)));
 		c.dispose();
 
-		if (root.children.size() > 0) {
-			double endYRoot = root.y + root.height - vgap / 2 ;
-			double rootMiddle = root.x + root.width / 2.0;
+		if (wt.children.length > 0) {
+			double endYRoot = wt.y() + wt.height() - vgap / 2 ;
+			double rootMiddle = wt.x() + wt.width() / 2.0;
 			double middleY = endYRoot + vgap / 2;
 			gc.drawLine(roundInt(zoom * (rootMiddle - xOffset)), 
 					    roundInt(zoom * (endYRoot - yOffset)), 
 					    roundInt(zoom * (rootMiddle - xOffset)),
 					    roundInt(zoom * (middleY - yOffset)) );
-			Tree firstKid = root.children.get(0);
-			double middleFirstKid =  firstKid.x + firstKid.width/2.0;
-			Tree lastKid = root.children.get(root.children.size()-1);
-			double middleLastKid = lastKid.x + lastKid.width/2.0;
+			WrappedTree firstKid = wt.children[0];
+			double middleFirstKid =  firstKid.x() + firstKid.width() / 2.0;
+			WrappedTree lastKid = wt.children[wt.children.length - 1];
+			double middleLastKid = lastKid.x() + lastKid.width() / 2.0;
 			gc.drawLine(roundInt(zoom * (middleFirstKid - xOffset)), 
 					    roundInt(zoom * (middleY - yOffset)), 
 					    roundInt(zoom * (rootMiddle - xOffset)),
@@ -177,25 +204,26 @@ public class TreeSWT
 					    roundInt(zoom * (middleLastKid - xOffset)),
 					    roundInt(zoom * (middleY - yOffset)));
 			
-			for (Tree kid : root.children) {
-				double middleKid = kid.x + kid.width / 2.0;
+			for (WrappedTree kid : wt.children) {
+				double middleKid = kid.x() + kid.width() / 2.0;
 				paintTree(kid, gc, r);
 				gc.drawLine(roundInt(zoom * (middleKid - xOffset)), 
 						    roundInt(zoom * (middleY - yOffset)), 
 						    roundInt(zoom * (middleKid - xOffset)), 
-						    roundInt(zoom * (kid.y + vgap / 2.0 - yOffset)));
+						    roundInt(zoom * (kid.y() + vgap / 2.0 - yOffset)));
 			}
 		}
 	}
 
 	@Override
 	public void paintControl(PaintEvent e) {
+		System.out.println("paintControl");
 		e.gc.setAdvanced(true);
 		Rectangle r = getClientArea();
 		e.gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		e.gc.fillRectangle(r);
 		e.gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
-		paintTree(tree, e.gc, r);
+		paintTree(wt, e.gc, r);
 	}
 
 	@Override

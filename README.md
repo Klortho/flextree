@@ -16,6 +16,7 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 # To do
 
+* Turn Tree into an interface.  All the WrappedTrees implement that interface.
 
 * Finish working on the RenderSWT/TreeSWT interface:
     * All the API should be moved to RenderSWT, including what's needed inside
