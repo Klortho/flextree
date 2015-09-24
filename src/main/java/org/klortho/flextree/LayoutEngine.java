@@ -17,11 +17,7 @@ public class LayoutEngine {
 	public static void layout(Tree t) { 
 		WrappedTree wt = new WrappedTree(t);
 
-		// "Walk zero" sets the y-coordinates, 
-        // which depend only on the y_size of the ancestor nodes.
-        wt.y(0);
-        zerothWalk(wt);
-        
+        setY(wt, 0);
 		firstWalk(wt); 
 		secondWalk(wt, 0);
 		normalizeX(wt);
@@ -70,11 +66,16 @@ public class LayoutEngine {
 
     // Recursively set the y coordinate of the children, based on
     // the y coordinate of the parent, and its height
-    static void zerothWalk(WrappedTree wt) {
+	static void setY(WrappedTree wt, double initial) {
+		wt.y(initial);
+		setY(wt);
+	}
+	
+    static void setY(WrappedTree wt) {
         double kid_y = wt.y() + wt.height();
         for (int i = 0; i < wt.num_children; ++i) {
             wt.children[i].y(kid_y);
-            zerothWalk(wt.children[i]);
+            setY(wt.children[i]);
         }
     }
 
@@ -264,7 +265,6 @@ public class LayoutEngine {
 	 */
 	static void normalizeX(WrappedTree wt) {
 		double minX = getMinX(wt);
-		System.out.println("minX = " + minX);
 		moveRight(wt, -minX);
 	}
 

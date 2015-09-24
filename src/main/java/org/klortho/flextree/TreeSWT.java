@@ -23,7 +23,7 @@ import org.klortho.flextree.RenderSWT.KeyHandler;
 /**
  * This class is managed by RenderSWT -- you shouldn't need to access it directly.
  * 
- * Construct this with an already-layed out (FIXME: right now, this class does the layout)
+ * Construct this with an already-layed out 
  * tree. You can update the display with a new tree at any time, by calling the render()
  * method.
  */
@@ -74,8 +74,6 @@ public class TreeSWT
 		render();
 	}
 
-
-
 	// This class wraps each node of the tree, storing the color that will be
 	// used to render the rectangle
 	class WrappedTree {
@@ -105,12 +103,9 @@ public class TreeSWT
 	 * rerender() method.
 	 */
 	private void render() {
-		// FIXME: this class shouldn't be doing the layout.
-		LayoutEngine.layout(t);
 		BoundingBox b = t.getBoundingBox();
 		width = b.width;
-		height = b.height;
-		
+		height = b.height;		
 		wt = new WrappedTree(t);
 	}
 

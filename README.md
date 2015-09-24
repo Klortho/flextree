@@ -16,19 +16,5 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 # To do
 
-* Move the layout stuff out of the TreeSWT class -- this should only render 
-  already layed-out trees.
-
-
-
-* See if the before-x, after-x that I get, now, are the same as what I got before.
-
-* Change TestInterface such that it can display an already layed-out tree, that
-  it gets from JSON.
-
-* Compare my svg rendering with this.
-
-* Get the SWT display to show the results of laying out src/test/resources/before-1.json
-  from the master branch.
-
+* Make the interface more D3-like
 

@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.klortho.flextree.RenderSWT.KeyHandler;
 
-public class Flextree {
+public class Main {
 	static RandomTreeGenerator gen;
 	static Tree t;
 
