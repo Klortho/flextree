@@ -36,8 +36,7 @@ public class FlextreeTest extends TestCase {
 	 * Test to see if a tree has any overlaps among its nodes.
 	 */
 	public static boolean overlap(Tree tree) {
-		ArrayList<Tree> nodes = new ArrayList<Tree>();
-		tree.allNodes(nodes);
+		ArrayList<Tree> nodes = tree.allNodes();
 		for (int i = 0 ; i < nodes.size(); i++) {
 			for (int j = 0 ; j < i ; j++) {
 				if (nodeOverlaps(nodes.get(i), nodes.get(j))){

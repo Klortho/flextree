@@ -27,7 +27,7 @@ public final class Tree {
         json_mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    // Sentinal value used for the parent of the root
+    // Sentinel value used for the parent of the root
     public static Tree NULL = new Tree();
     
     /**
@@ -51,13 +51,18 @@ public final class Tree {
         this.parent = NULL;
 	}
 
-    // Create a tree from a JSON file
+    /**
+     *  Create a tree from a JSON file
+     */
     public static Tree fromJson(File json) 
       throws IOException
     {
         return json_mapper.readValue(json, Tree.class);
     }
 
+    /**
+     * Serialize to JSON
+     */
     public String toJson() 
       throws JsonProcessingException
     {
@@ -79,6 +84,9 @@ public final class Tree {
 		}
 	}
 	
+	/**
+	 * Get the total number of nodes in this tree.
+	 */
 	public int size() {
 		int res = 1;
 		for (Tree node : children) {
@@ -91,11 +99,13 @@ public final class Tree {
 		return children.size() > 0;
 	}
 	
-	public void allNodes(ArrayList<Tree> nodes) {
+	public ArrayList<Tree> allNodes() {
+		ArrayList<Tree> nodes = new ArrayList<Tree>();
 		nodes.add(this);
-		for (Tree node : children) {
-			node.allNodes(nodes);
+		for (Tree kid : children) {
+			nodes.addAll(kid.allNodes());
 		}
+		return nodes;
 	}
 	
 	public int getDepth() {
@@ -125,14 +135,6 @@ public final class Tree {
 		System.out.print(")");
 	}
 
-	public void mul(double w, double h){
-		width *= w;
-		height *= h;
-		for (Tree child : children) {
-			child.mul(w, h);
-		}
-	}
-	
 	/**
 	 * Compare two trees in terms of the size and positions of their nodes
 	 */
