@@ -16,30 +16,10 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 # To do
 
-
-* Finish working on the RenderSWT/TreeSWT interface:
-    * All the API should be moved to RenderSWT, including what's needed inside
-      z-handler.
-    * Need also to define hgap, vgap, and zoom there.
-    * hgap, vgap, and zoom should, by default, be determined dynamically, if
-      it is easy.
+* Move the layout stuff out of the TreeSWT class -- this should only render 
+  already layed-out trees.
 
 
-
-* Turn Tree into an interface.  All the WrappedTrees implement that interface.
-
-
-* My main program will have these features:
-    * Input: 
-        * Generate a random tree, with parameters specified, or
-        * Get input from JSON
-    * Output:
-        * JSON
-        * SWT
-        * SVG
-
-
-* Move the TreeElement overlap() method into a unit test, and use it there.
 
 * See if the before-x, after-x that I get, now, are the same as what I got before.
 

@@ -34,7 +34,7 @@ public class TreeSWT
   implements SelectionListener, PaintListener, ControlListener , Listener, KeyListener
 {
 	RenderSWT parent;
-	Tree tree;
+	Tree t;
 	WrappedTree wt;
 	
 	double xOffset, yOffset;
@@ -48,11 +48,11 @@ public class TreeSWT
 
 	KeyHandler z_handler; 
 	
-	public TreeSWT(Composite parent, Tree tree, KeyHandler z_handler,
+	public TreeSWT(Composite parent, Tree t, KeyHandler z_handler,
 			double hgap, double vgap, double zoom) {
 		super(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		this.parent = (RenderSWT) parent;
-		this.tree = tree;
+		this.t = t;
 		this.z_handler = z_handler;
 		this.hgap = hgap;
 		this.vgap = vgap;
@@ -71,7 +71,7 @@ public class TreeSWT
 	 * Re-render, with a new tree.
 	 */
 	public void rerender(Tree tree) {
-		this.tree = tree;
+		this.t = tree;
 		render();
 	}
 
@@ -106,17 +106,15 @@ public class TreeSWT
 	 * rerender() method.
 	 */
 	private void render() {
-		// FIXME: what does this do?
-		tree.layer();
 		// FIXME: this class shouldn't be doing the layout.
-		LayoutEngine.layout(tree);
+		LayoutEngine.layout(t);
 		// FIXME: what does this do?
-		tree.normalizeX();
-		BoundingBox b = tree.getBoundingBox();
+		t.normalizeX();
+		BoundingBox b = t.getBoundingBox();
 		width = b.width;
 		height = b.height;
 		
-		wt = new WrappedTree(tree);
+		wt = new WrappedTree(t);
 	}
 
 	public void setScrollBars() {
@@ -261,7 +259,7 @@ public class TreeSWT
 			render();
 		} 
 		else if (e.keyCode == 'p') {
-			tree.print();
+			t.print();
 			System.out.printf("\n");
 		}
 		setScrollBars();

@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import org.klortho.flextree.LayoutEngine.WrappedTree;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -33,8 +31,6 @@ public class FlextreeTest extends TestCase {
     {
         return new TestSuite( FlextreeTest.class );
     }
-
-    
     
 	/**
 	 * Test to see if a tree has any overlaps among its nodes.
@@ -145,12 +141,8 @@ public class FlextreeTest extends TestCase {
 	}
 
 	public void layoutAndCheckTree(Tree t) {
-    	// FIXME: after you get the test written, refactor to move this stuff into
-    	// the LayoutEngine's layout method:
-    	t.layer();
     	LayoutEngine.layout(t);
     	t.normalizeX();  // FIXME: what does this do?
-    	
     	assertFalse(overlap(t));
 	}
 
@@ -169,7 +161,6 @@ public class FlextreeTest extends TestCase {
     public void testRandomTree()
     {
     	int SEED = 43;
-
     	Tree t = RandomTreeGenerator.makeTree(50, 10, 100, 10, 100, SEED);
     	layoutAndCheckTree(t);
     }
@@ -180,8 +171,7 @@ public class FlextreeTest extends TestCase {
     public void testApp()
     {
         try {
-            for (int test_num = 1; test_num <= 5; ++test_num) {
-            	File f = getFile("before-" + test_num + ".json");
+            for (int test_num = 1; test_num <= 6; ++test_num) {
                 Tree tree = Tree.fromJson(getFile("before-" + test_num + ".json"));
                 tree.print();
         		layoutAndCheckTree(tree);

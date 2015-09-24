@@ -145,20 +145,6 @@ public final class Tree {
 		}
 	}
 	
-	// FIXME: these two methods set the y-coordinate. They should be done automatically
-	// as part of the layout.
-	public void layer() {
-		layer(0);
-	}
-	
-	public void layer(double d){
-		y = d;
-		d += height;
-		for (Tree child : children) {
-			child.layer(d);
-		}
-	}
-	
 	// FIXME: move this to RandomTreeGenerator
 	public void randExpand(Tree t, Random r) {
 		t.y += height;

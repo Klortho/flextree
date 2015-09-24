@@ -9,7 +9,6 @@ public class RandomTreeGenerator {
 	double minWidth, maxWidth;
 	double minHeight, maxHeight;
 
-
 	/**
 	 * Convenience static method to generate one random tree.
 	 */
@@ -37,14 +36,13 @@ public class RandomTreeGenerator {
 		this.maxHeight = maxHeight;
 	}
 
-
 	/**
 	 * Return a random tree with a set number of nodes. Each node has a random 
 	 * width and height, and is placed randomly into the tree.
 	 */
 	public Tree randomTree() {
 		Tree root = randomNode();
-		for (int i = 0 ; i < numNodes - 1 ; i++){
+		for (int i = 0 ; i < numNodes - 1 ; i++) {
 			root.randExpand(randomNode(), rand);
 		}
 		return root;		
@@ -59,5 +57,4 @@ public class RandomTreeGenerator {
 		double r = rand.nextDouble();
 		return Math.rint((start + r * (end - start)) * 2)/2;
 	}
-	
 }
