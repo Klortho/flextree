@@ -19,6 +19,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.klortho.flextree.RenderSWT.KeyHandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 
 /**
  * This class is managed by RenderSWT -- you shouldn't need to access it directly.
@@ -248,10 +250,17 @@ public class TreeSWT
 		} 
 		else if (e.keyCode == 'a') {
 			render();
-		} 
+		}
 		else if (e.keyCode == 'p') {
 			t.print();
 			System.out.printf("\n");
+		}
+		else if (e.keyCode == 'j') {
+			try {
+				System.out.print(t.toJson() + "\n");
+			} catch (JsonProcessingException e1) {
+				e1.printStackTrace();
+			}
 		}
 		setScrollBars();
 		redraw();

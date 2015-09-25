@@ -11,7 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-@JsonIgnoreProperties({ "boundingBox", "minX", "depth" })
+@JsonIgnoreProperties({ "boundingBox", "minX", "depth", "parent" })
 public final class Tree {
 	public double width, height;
 	public Vector<Tree> children;

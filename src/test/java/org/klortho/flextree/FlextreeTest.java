@@ -169,7 +169,7 @@ public class FlextreeTest extends TestCase {
     public void testApp()
     {
         try {
-            for (int test_num = 1; test_num <= 1; ++test_num) {
+            for (int test_num = 1; test_num <= 8; ++test_num) {
                 Tree tree = Tree.fromJson(getFile("before-" + test_num + ".json"));
                 tree.print();
         		layoutAndCheckTree(tree);
