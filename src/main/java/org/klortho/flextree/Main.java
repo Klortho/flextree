@@ -4,14 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import org.klortho.flextree.LayoutEngine.Separation;
 import org.klortho.flextree.RenderSWT.KeyHandler;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class Main {
 	static RandomTreeGenerator gen;
 	static Tree t;
+	static LayoutEngine engine = new LayoutEngine();
 
 	public static void main(String argv[]) {
 		try {
@@ -20,7 +18,7 @@ public class Main {
 			// Two ways to make a tree:
 			//t = gen.randomTree();
 	        t = getTreeFromFile("before.json");
-			layout(t);
+			engine.layout(t);
 			PrintWriter out = new PrintWriter("after.json");
 			out.println(t.toJson());
 			out.close();
@@ -30,7 +28,7 @@ public class Main {
 			KeyHandler z_handler = new KeyHandler() {
 				public void execute(RenderSWT r) {
 					Tree t = getTreeFromFile("before.json");
-					layout(t);
+					engine.layout(t);
 					r.rerender(t);
 				}
 			};
@@ -51,15 +49,5 @@ public class Main {
 			System.err.println("IOException: " + e.getMessage());
 		}
 		return t;
-	}
-	
-	static void layout(Tree t) {
-		Separation separation = new Separation() {
-			public double s(Tree a, Tree b) {
-				//return a.parent == b.parent ? 0 : 1;
-				return 1;
-			}
-		};
-		LayoutEngine.layout(t, separation);
 	}
 }

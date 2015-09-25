@@ -11,6 +11,7 @@ public class Measure {
 	public static int INCREMENT = 100;
 	public static int NUM_TESTS = 200;
 	public static long SEED = 42;
+	static LayoutEngine engine = new LayoutEngine();
 
 	public static void main(String[] argv) {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -23,7 +24,7 @@ public class Measure {
 	static long timeLayout(Tree tree) {
 		System.gc();
 		long start = System.nanoTime();
-		LayoutEngine.layout(tree);
+		engine.layout(tree);
 		long now = System.nanoTime();
 		return now - start;
 	}

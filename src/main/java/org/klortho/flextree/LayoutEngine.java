@@ -10,18 +10,87 @@ package org.klortho.flextree;
  * 
  * This LayoutEngine sets the x and y coordinates for every node in the tree such that:
  * - minimum x and minimum y are both 0.
+ * 
+ * Instantiate one of these with either:
+ * - LayoutEngine engine = new LayoutEngine();   // to use all defaults
+ * - LayoutEngine engine = LayoutEngine.builder()
+ *       .setSeparation(s)
+ *       ...
+ *       .build(); 
  */
 
 public class LayoutEngine {
-	// Set default separation
-	static Separation separation = new Separation() {
+
+	// This interface defines a function that takes two trees, and returns a
+	// double.  It's used for separation() and spacing().
+	public interface TreeRelation {
+		abstract double s(Tree a, Tree b);
+	}
+	
+	// This is a sentinal value for separation and spacing, meaning not set
+	public static final TreeRelation NULL_TREE_RELATION = new TreeRelation() {
+		public double s(Tree a, Tree b) { return 0.0; }
+	};
+
+	// Separation
+	public static final TreeRelation defaultSeparation = new TreeRelation() {
 		public double s(Tree a, Tree b) {
-			//return a.parent == b.parent ? 0 : 1;
-			return 1;
+			return a.parent == b.parent ? 0 : 1;
 		}
 	};
+	TreeRelation separation = defaultSeparation;
 	
-	public static void layout(Tree t) { 
+	// Spacing
+	public static final TreeRelation defaultSpacing = NULL_TREE_RELATION;
+	TreeRelation spacing = defaultSpacing;
+
+	
+	public static class Builder {
+		public LayoutEngine build() {
+			return new LayoutEngine(this);
+		}
+		public Builder setSeparation(TreeRelation s) {
+			separation = s;
+			spacing = NULL_TREE_RELATION;
+			return this;
+		}
+		public Builder setSpacing(TreeRelation s) {
+			spacing = s;
+			separation = NULL_TREE_RELATION;
+			return this;
+		}
+		
+		private TreeRelation separation = defaultSeparation;
+		private TreeRelation spacing = defaultSpacing;
+	}
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	
+	/**
+	 * Default constructor - when all the defaults are okay.
+	 */
+	public LayoutEngine() {
+	}
+	
+	/**
+	 * Construct a Layout engine from a Builder
+	 */
+	public LayoutEngine(Builder b) {
+		separation = b.separation;
+		spacing = b.spacing;
+	}
+	
+	/**
+	 * Does the layout, setting the following attributes on each Tree node:
+	 * parent - the parent node, or null for the root.
+	 * depth - the depth of the node, starting at 0 for the root.
+	 * x - the computed x-coordinate of the node position.
+	 * y - the computed y-coordinate of the node position.
+	 */
+	public void layout(Tree t) { 
 		WrappedTree wt = new WrappedTree(t);
         zerothWalk(wt, 0);
 		firstWalk(wt); 
@@ -29,15 +98,6 @@ public class LayoutEngine {
 		normalizeX(wt);
 	}
 
-	// Interface to use for the separation
-	public interface Separation {
-		abstract double s(Tree a, Tree b);
-	}
-
-	public static void layout(Tree t, Separation s) {
-		separation = s;
-		layout(t);
-	}
 
 	private static class WrappedTree {
 	    Tree t;
@@ -91,13 +151,13 @@ public class LayoutEngine {
     // Recursively set the y coordinate of the children, based on
     // the y coordinate of the parent, and its height. Also set parent and
 	// depth.
-	static void zerothWalk(WrappedTree wt, double initial) {
+	void zerothWalk(WrappedTree wt, double initial) {
 		wt.y(initial);
 		wt.depth(0);
 		zerothWalk(wt);
 	}
 	
-    static void zerothWalk(WrappedTree wt) {
+    void zerothWalk(WrappedTree wt) {
         double kid_y = wt.y() + wt.height();
         int kid_depth = wt.depth() + 1;
         for (int i = 0; i < wt.num_children; ++i) {
@@ -109,7 +169,7 @@ public class LayoutEngine {
         }
     }
 
-	static void firstWalk(WrappedTree t) {
+	void firstWalk(WrappedTree t) {
         if (t.num_children == 0) { 
 		    setExtremes(t); 
 		    return; 
@@ -132,7 +192,7 @@ public class LayoutEngine {
         setExtremes(t);
 	}
 		  
-	static void setExtremes(WrappedTree t) {
+	void setExtremes(WrappedTree t) {
 	    if (t.num_children == 0) {
 	        t.el = t; 
 	        t.er = t;
@@ -146,7 +206,7 @@ public class LayoutEngine {
 	    }
 	}
 	  
-	static void seperate(WrappedTree t, int i, IYL ih) {
+	void seperate(WrappedTree t, int i, IYL ih) {
 	    // Right contour node of left siblings and its sum of modfiers.  
 	    WrappedTree sr = t.children[i-1]; 
 	    double mssr = sr.mod;
@@ -186,7 +246,7 @@ public class LayoutEngine {
 	    else if (sr != null && cl == null) setRightThread(t, i, sr, mssr);
 	}
 
-	static void moveSubtree(WrappedTree t, int i, int si, double dist) {
+	void moveSubtree(WrappedTree t, int i, int si, double dist) {
 	    // Move subtree by changing mod.  
 	    t.children[i].mod += dist; 
 	    t.children[i].msel += dist; 
@@ -194,19 +254,19 @@ public class LayoutEngine {
 	    distributeExtra(t, i, si, dist);                                  
 	}
 	  
-	static WrappedTree nextLeftContour(WrappedTree t) {
+	WrappedTree nextLeftContour(WrappedTree t) {
 		return t.num_children == 0 ? t.tl : t.children[0];
 	}
 	
-	static WrappedTree nextRightContour(WrappedTree t) {
+	WrappedTree nextRightContour(WrappedTree t) {
 		return t.num_children == 0 ? t.tr : t.children[t.num_children - 1];
 	}
 	
-	static double bottom(WrappedTree t) { 
+	double bottom(WrappedTree t) { 
 		return t.y() + t.height(); 
 	}
 	  
-	static void setLeftThread(WrappedTree t, int i, WrappedTree cl, double modsumcl) {
+	void setLeftThread(WrappedTree t, int i, WrappedTree cl, double modsumcl) {
 	    WrappedTree li = t.children[0].el;
 	    li.tl = cl;
 	   
@@ -223,7 +283,7 @@ public class LayoutEngine {
 	}
 	  
 	// Symmetrical to setLeftThread.  
-	static void setRightThread(WrappedTree t, int i, WrappedTree sr, double modsumsr) {
+	void setRightThread(WrappedTree t, int i, WrappedTree sr, double modsumsr) {
 	    WrappedTree ri = t.children[i].er;
 	    ri.tr = sr;
 	    double diff = (modsumsr - sr.mod) - t.children[i].mser;
@@ -233,7 +293,7 @@ public class LayoutEngine {
 	    t.children[i].mser = t.children[i - 1].mser;
 	}
 
-	static void positionRoot(WrappedTree wt) {
+	void positionRoot(WrappedTree wt) {
 	    // Position root between children, taking into account their mod.  
 	    wt.prelim = ( wt.children[0].prelim + 
 	 		          wt.children[0].mod + 
@@ -243,7 +303,7 @@ public class LayoutEngine {
 			        - wt.width() / 2;
 	}
 
-	static void secondWalk(WrappedTree t, double modsum) {
+	void secondWalk(WrappedTree t, double modsum) {
 	    modsum += t.mod;
 	    // Set absolute (non-relative) horizontal coordinate.  
 	    t.x(t.prelim + modsum);
@@ -251,7 +311,7 @@ public class LayoutEngine {
 	    for (int i = 0; i < t.num_children; i++) secondWalk(t.children[i], modsum);
 	}
 
-	static void distributeExtra(WrappedTree t, int i, int si, double dist) {           
+	void distributeExtra(WrappedTree t, int i, int si, double dist) {           
 	    // Are there intermediate children?
 	    if (si != i - 1) {                                                    
 	        double nr = i - si;                                            
@@ -262,7 +322,7 @@ public class LayoutEngine {
 	}                                                                    
 	 
 	// Process change and shift to add intermediate spacing to mod.  
-	static void addChildSpacing(WrappedTree t) {
+	void addChildSpacing(WrappedTree t) {
 	    double d = 0, modsumdelta = 0;                                    
 	    for (int i = 0; i < t.num_children; i++) {                                  
 	        d += t.children[i].shift;                                               
@@ -283,7 +343,7 @@ public class LayoutEngine {
 	    }                                                                     
 	}                                                                       
 	  
-	static IYL updateIYL(double minY, int i, IYL ih) {                         
+	IYL updateIYL(double minY, int i, IYL ih) {                         
 	    // Remove siblings that are hidden by the new subtree.  
 	    while (ih != null && minY >= ih.lowY) ih = ih.nxt;                 
 	    // Prepend the new subtree.  
@@ -293,12 +353,12 @@ public class LayoutEngine {
 	/**
 	 * Normalize the x-coordinate, so that the minimum x is 0.
 	 */
-	static void normalizeX(WrappedTree wt) {
+	void normalizeX(WrappedTree wt) {
 		double minX = getMinX(wt);
 		moveRight(wt, -minX);
 	}
 
-	static double getMinX(WrappedTree wt) {
+	double getMinX(WrappedTree wt) {
 		double minX = wt.x();
 		for (WrappedTree child : wt.children) {
 			minX = Math.min(getMinX(child), minX);
@@ -306,7 +366,7 @@ public class LayoutEngine {
 		return minX;
 	}
 	
-	static public void moveRight(WrappedTree wt, double move) {
+	public void moveRight(WrappedTree wt, double move) {
 		wt.x(wt.x() + move);
 		for (WrappedTree child : wt.children) {
 			moveRight(child, move);
