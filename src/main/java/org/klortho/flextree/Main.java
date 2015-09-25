@@ -9,10 +9,13 @@ import org.klortho.flextree.RenderSWT.KeyHandler;
 public class Main {
 	static RandomTreeGenerator gen;
 	static Tree t;
-	static LayoutEngine engine = new LayoutEngine();
+	static LayoutEngine engine;
 
 	public static void main(String argv[]) {
 		try {
+			engine = LayoutEngine.builder()
+					     .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
+					     .build();
 			gen = new RandomTreeGenerator(50, 20, 100, 20, 100, (int) Math.random() * 1000);
 			
 			// Two ways to make a tree:

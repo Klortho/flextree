@@ -11,10 +11,15 @@ public class Measure {
 	public static int INCREMENT = 100;
 	public static int NUM_TESTS = 200;
 	public static long SEED = 42;
-	static LayoutEngine engine = new LayoutEngine();
+	static LayoutEngine engine;
 
 	public static void main(String[] argv) {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+
+		engine = LayoutEngine.builder()
+                     .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
+                     .build();
+
 		for (int numNodes = 1; numNodes < MAX_SIZE; numNodes += INCREMENT) {
 			RandomTreeGenerator gen = new RandomTreeGenerator(numNodes, 1, 10, 1, 10, 5000);
 			runTests(gen, NUM_TESTS);

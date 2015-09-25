@@ -140,8 +140,10 @@ public class FlextreeTest extends TestCase {
 	}
 
 	public void layoutAndCheckTree(Tree t) {
-    	LayoutEngine tree = new LayoutEngine();
-    	tree.layout(t);
+		LayoutEngine engine = LayoutEngine.builder()
+			                      .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
+			                      .build();
+    	engine.layout(t);
     	assertFalse(overlap(t));
 	}
 

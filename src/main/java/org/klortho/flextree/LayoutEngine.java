@@ -1,5 +1,7 @@
 package org.klortho.flextree;
 
+import org.klortho.flextree.LayoutEngine.NodeSizeFunction;
+
 /**
  * The extended Reingold-Tilford algorithm as described in the paper
  * "Drawing Non-layered Tidy Trees in Linear Time" by Atze van der Ploeg
@@ -43,6 +45,30 @@ public class LayoutEngine {
 	// Spacing
 	public static final TreeRelation defaultSpacing = NULL_TREE_RELATION;
 	TreeRelation spacing = defaultSpacing;
+	
+	// NodeSizeFunction - returns an array [x_size, y_size]
+	public interface NodeSizeFunction {
+		abstract double[] ns(Tree t);
+	}
+	// By default, the node-size function is *null*.
+	public static final NodeSizeFunction NULL_NODE_SIZE_FUNCTION = 
+		new NodeSizeFunction() {
+		    public double[] ns(Tree t) {
+		    	return new double[2]; 
+		    }
+        };
+    public static final NodeSizeFunction defaultNodeSizeFunction = NULL_NODE_SIZE_FUNCTION;
+    NodeSizeFunction nodeSizeFunction = defaultNodeSizeFunction;
+    
+    // This node size function is defined for convenience -- it gets the node size from
+    // x_size and y_size attributes on the Tree node itself.
+	public static final NodeSizeFunction nodeSizeFromTree = new NodeSizeFunction() {
+		public double[] ns(Tree t) {
+			return new double[] {t.x_size, t.y_size};
+		}
+	};
+
+    
 
 	
 	public static class Builder {
@@ -59,9 +85,14 @@ public class LayoutEngine {
 			separation = NULL_TREE_RELATION;
 			return this;
 		}
+		public Builder setNodeSizeFunction(NodeSizeFunction nsf) {
+			nodeSizeFunction = nsf;
+			return this;
+		}
 		
 		private TreeRelation separation = defaultSeparation;
 		private TreeRelation spacing = defaultSpacing;
+		private NodeSizeFunction nodeSizeFunction = defaultNodeSizeFunction;
 	}
 	
 	public static Builder builder() {
@@ -81,6 +112,7 @@ public class LayoutEngine {
 	public LayoutEngine(Builder b) {
 		separation = b.separation;
 		spacing = b.spacing;
+		nodeSizeFunction = b.nodeSizeFunction;
 	}
 	
 	/**
@@ -99,10 +131,11 @@ public class LayoutEngine {
 	}
 
 
-	private static class WrappedTree {
+	private class WrappedTree {
 	    Tree t;
+	    double x_size, y_size;
 	    WrappedTree[] children; 
-	    int num_children;     // Array of children and number of children. 
+	    int num_children;     // Array of children and number of children.
 
 	    double prelim, mod, shift, change;
 	    WrappedTree tl, tr;          // Left and right thread.                        
@@ -111,6 +144,20 @@ public class LayoutEngine {
 	   
 		public WrappedTree(Tree t) {
 			this.t = t;
+			
+			// Set the size attributes of this node, based on whatever method was selected
+			// by the user.
+			if (nodeSizeFunction == NULL_NODE_SIZE_FUNCTION) {
+				// FIXME: this should use fixed node size, or size, but those aren't implemented
+				// yet.
+				this.x_size = t.x_size;
+				this.y_size = t.y_size;
+			}
+			else {
+    			double[] nodeSize = nodeSizeFunction.ns(t);
+    			this.x_size = nodeSize[0];
+    			this.y_size = nodeSize[1];
+			}
 
 		    children = new WrappedTree[t.children.size()];
 		    num_children = children.length;
@@ -119,11 +166,11 @@ public class LayoutEngine {
 	        }
 		}	    
 	    
-        public double width() {
-            return t.x_size;
+        public double x_size() {
+            return x_size;
         }
-        public double height() {
-            return t.y_size;
+        public double y_size() {
+            return y_size;
         }
         public void parent(Tree p) {
         	t.parent = p;
@@ -158,7 +205,7 @@ public class LayoutEngine {
 	}
 	
     void zerothWalk(WrappedTree wt) {
-        double kid_y = wt.y() + wt.height();
+        double kid_y = wt.y() + wt.y_size();
         int kid_depth = wt.depth() + 1;
         for (int i = 0; i < wt.num_children; ++i) {
         	WrappedTree kid = wt.children[i];
@@ -219,7 +266,7 @@ public class LayoutEngine {
 		    if (bottom(sr) > ih.lowY) ih = ih.nxt;
 		  
 		    // How far to the left of the right side of sr is the left side of cl?  
-		    double dist = (mssr + sr.prelim + sr.width()) - (mscl + cl.prelim);
+		    double dist = (mssr + sr.prelim + sr.x_size()) - (mscl + cl.prelim);
 		    if (dist > 0) {
 		        mscl += dist;
 		        moveSubtree(t, i, ih.index, dist);
@@ -263,7 +310,7 @@ public class LayoutEngine {
 	}
 	
 	double bottom(WrappedTree t) { 
-		return t.y() + t.height(); 
+		return t.y() + t.y_size(); 
 	}
 	  
 	void setLeftThread(WrappedTree t, int i, WrappedTree cl, double modsumcl) {
@@ -299,8 +346,8 @@ public class LayoutEngine {
 	 		          wt.children[0].mod + 
  			          wt.children[wt.num_children - 1].mod + 
                       wt.children[wt.num_children - 1].prelim + 
-                      wt.children[wt.num_children - 1].width() ) / 2 
-			        - wt.width() / 2;
+                      wt.children[wt.num_children - 1].x_size() ) / 2 
+			        - wt.x_size() / 2;
 	}
 
 	void secondWalk(WrappedTree t, double modsum) {
