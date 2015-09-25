@@ -1,27 +1,27 @@
 {
-  "width" : 30.0,
-  "height" : 30.0,
+  "x_size" : 30.0,
+  "y_size" : 30.0,
   "children" : [ {
-    "width" : 30.0,
-    "height" : 30.0,
+    "x_size" : 30.0,
+    "y_size" : 30.0,
     "children" : [ {
-      "width" : 150.0,
-      "height" : 30.0,
+      "x_size" : 150.0,
+      "y_size" : 30.0,
       "children" : [ ],
       "x" : 0.0,
       "y" : 60.0
     }, {
-      "width" : 150.0,
-      "height" : 30.0,
+      "x_size" : 150.0,
+      "y_size" : 30.0,
       "children" : [ {
-        "width" : 150.0,
-        "height" : 30.0,
+        "x_size" : 150.0,
+        "y_size" : 30.0,
         "children" : [ ],
         "x" : 75.0,
         "y" : 90.0
       }, {
-        "width" : 150.0,
-        "height" : 30.0,
+        "x_size" : 150.0,
+        "y_size" : 30.0,
         "children" : [ ],
         "x" : 225.0,
         "y" : 90.0
@@ -32,35 +32,35 @@
     "x" : 135.0,
     "y" : 30.0
   }, {
-    "width" : 30.0,
-    "height" : 30.0,
+    "x_size" : 30.0,
+    "y_size" : 30.0,
     "children" : [ ],
     "x" : 205.0,
     "y" : 30.0
   }, {
-    "width" : 30.0,
-    "height" : 30.0,
+    "x_size" : 30.0,
+    "y_size" : 30.0,
     "children" : [ ],
     "x" : 275.0,
     "y" : 30.0
   }, {
-    "width" : 30.0,
-    "height" : 60.0,
+    "x_size" : 30.0,
+    "y_size" : 60.0,
     "children" : [ ],
     "x" : 345.0,
     "y" : 30.0
   }, {
-    "width" : 30.0,
-    "height" : 30.0,
+    "x_size" : 30.0,
+    "y_size" : 30.0,
     "children" : [ ],
     "x" : 390.0,
     "y" : 30.0
   }, {
-    "width" : 30.0,
-    "height" : 60.0,
+    "x_size" : 30.0,
+    "y_size" : 60.0,
     "children" : [ {
-      "width" : 150.0,
-      "height" : 30.0,
+      "x_size" : 150.0,
+      "y_size" : 30.0,
       "children" : [ ],
       "x" : 375.0,
       "y" : 90.0

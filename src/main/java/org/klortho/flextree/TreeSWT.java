@@ -96,8 +96,8 @@ public class TreeSWT
 		}
 		public double x() { return tree.x; }
 		public double y() { return tree.y; }
-		public double width() { return tree.width; }
-		public double height() { return tree.height; }
+		public double width() { return tree.x_size; }
+		public double height() { return tree.y_size; }
 	}
 	
 	/**

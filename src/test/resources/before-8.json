@@ -1,54 +1,54 @@
 {
-    "width": 30,
-    "height": 30,
+    "x_size": 30,
+    "y_size": 30,
     "children": [
         {
-            "width": 30,
-            "height": 60,
+            "x_size": 30,
+            "y_size": 60,
             "children": [
                 {
-                    "width": 150,
-                    "height": 30
+                    "x_size": 150,
+                    "y_size": 30
                 }
             ]
         },
         {
-            "width": 30,
-            "height": 30
+            "x_size": 30,
+            "y_size": 30
         },
         {
-            "width": 30,
-            "height": 60
+            "x_size": 30,
+            "y_size": 60
         },
         {
-            "width": 30,
-            "height": 30
+            "x_size": 30,
+            "y_size": 30
         },
         {
-            "width": 30,
-            "height": 30
+            "x_size": 30,
+            "y_size": 30
         },
         {
-            "width": 30,
-            "height": 30,
+            "x_size": 30,
+            "y_size": 30,
             "children": [
                 {
-                    "width": 150,
-                    "height": 30,
+                    "x_size": 150,
+                    "y_size": 30,
                     "children": [
                         {
-                            "width": 150,
-                            "height": 30
+                            "x_size": 150,
+                            "y_size": 30
                         },
                         {
-                            "width": 150,
-                            "height": 30
+                            "x_size": 150,
+                            "y_size": 30
                         }
                     ]
                 },
                 {
-                    "width": 150,
-                    "height": 30
+                    "x_size": 150,
+                    "y_size": 30
                 }
             ]
         }

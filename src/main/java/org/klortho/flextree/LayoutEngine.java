@@ -120,10 +120,10 @@ public class LayoutEngine {
 		}	    
 	    
         public double width() {
-            return t.width;
+            return t.x_size;
         }
         public double height() {
-            return t.height;
+            return t.y_size;
         }
         public void parent(Tree p) {
         	t.parent = p;

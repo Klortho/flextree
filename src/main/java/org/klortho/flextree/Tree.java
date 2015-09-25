@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 @JsonIgnoreProperties({ "boundingBox", "minX", "depth", "parent" })
 public final class Tree {
-	public double width, height;
+	public double x_size, y_size;
 	public Vector<Tree> children;
 	
 	// Set by the layout engine:
@@ -35,8 +35,8 @@ public final class Tree {
      * objects from JSON.
      */
     public Tree() {
-        this.width = 1.0;
-        this.height = 1.0;
+        this.x_size = 1.0;
+        this.y_size = 1.0;
         this.children = new Vector<Tree>();
         this.parent = NULL;
         this.x = 0;
@@ -44,8 +44,8 @@ public final class Tree {
     }
 
     public Tree(double width, double height, Tree ... children) {
-		this.width = width;
-		this.height = height;
+		this.x_size = width;
+		this.y_size = height;
 		this.children = new Vector<Tree>();
 		this.children.addAll(Arrays.asList(children));
         this.parent = NULL;
@@ -77,8 +77,8 @@ public final class Tree {
 	}
 	
 	private static void getBoundingBox(Tree tree, BoundingBox b) {
-		b.width = Math.max(b.width, tree.x + tree.width);
-		b.height = Math.max(b.height, tree.y + tree.height);
+		b.width = Math.max(b.width, tree.x + tree.x_size);
+		b.height = Math.max(b.height, tree.y + tree.y_size);
 		for (Tree child : tree.children) {
 			getBoundingBox(child, b);
 		}
@@ -126,7 +126,7 @@ public final class Tree {
 	private void print(int indent) {
 		String istr = "";
 		for (int i = 0; i < indent; ++i) istr += "  ";
-		System.out.printf(istr + "new Tree(%f, %f", width, height);
+		System.out.printf(istr + "new Tree(%f, %f", x_size, y_size);
 		for (Tree child : children) {
 			System.out.printf(",\n");
 			child.print(indent + 1);
@@ -139,15 +139,15 @@ public final class Tree {
 	 * Compare two trees in terms of the size and positions of their nodes
 	 */
     public boolean deepEquals(Tree other) {
-        if (width != other.width ||
-            height != other.height ||
+        if (x_size != other.x_size ||
+            y_size != other.y_size ||
             x != other.x ||
             y != other.y ||
             children.size() != other.children.size()) //return false;
         {
         	System.out.println("mismatch:\n" +
-            		"width: " + width + " <=> " + other.width + "\n" +
-            		"height: " + height + " <=> " + other.height + "\n" +
+            		"width: " + x_size + " <=> " + other.x_size + "\n" +
+            		"height: " + y_size + " <=> " + other.y_size + "\n" +
             		"x: " + x + " <=> " + other.x + "\n" +
             		"y: " + y + " <=> " + other.y + "\n"
             );

@@ -1,32 +1,32 @@
 {
-    "width": 30,
-    "height": 100,
+    "x_size": 30,
+    "y_size": 100,
     "children": [
         {
-            "width": 30,
-            "height": 100
+            "x_size": 30,
+            "y_size": 100
         },
         {
-            "width": 30,
-            "height": 30,
+            "x_size": 30,
+            "y_size": 30,
             "children": [
                 {
-                    "width": 30,
-                    "height": 100
+                    "x_size": 30,
+                    "y_size": 100
                 }
             ]
         },
         {
-            "width": 30,
-            "height": 100
+            "x_size": 30,
+            "y_size": 100
         },
         {
-            "width": 30,
-            "height": 30,
+            "x_size": 30,
+            "y_size": 30,
             "children": [
                 {
-                    "width": 30,
-                    "height": 100
+                    "x_size": 30,
+                    "y_size": 100
                 }
             ]
         }

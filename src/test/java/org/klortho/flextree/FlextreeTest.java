@@ -56,8 +56,8 @@ public class FlextreeTest extends TestCase {
 	}
 
 	public static boolean nodeOverlaps(Tree a, Tree b) {
-		return overlap(a.x, a.x + a.width, b.x , b.x + b.width) &&
-			   overlap(a.y, a.y + a.height, b.y, b.y + b.height);
+		return overlap(a.x, a.x + a.x_size, b.x , b.x + b.x_size) &&
+			   overlap(a.y, a.y + a.y_size, b.y, b.y + b.y_size);
 	}
 	
 
