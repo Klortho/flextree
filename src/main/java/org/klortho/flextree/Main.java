@@ -13,9 +13,14 @@ public class Main {
 
 	public static void main(String argv[]) {
 		try {
+			/*
 			engine = LayoutEngine.builder()
 					     .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
 					     .build();
+		    */
+			engine = LayoutEngine.builder()
+				     .setNodeSizeFixed(new double[] {50, 50})
+				     .build();
 			gen = new RandomTreeGenerator(50, 20, 100, 20, 100, (int) Math.random() * 1000);
 			
 			// Two ways to make a tree:

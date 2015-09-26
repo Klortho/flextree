@@ -172,10 +172,24 @@ public class FlextreeTest extends TestCase {
     public void testApp()
     {
         try {
-            for (int test_num = 1; test_num <= 8; ++test_num) {
+            for (int test_num = 1; test_num <= 9; ++test_num) {
                 Tree tree = Tree.fromJson(getFile("before-" + test_num + ".json"));
                 tree.print();
-        		layoutAndCheckTree(tree);
+                
+                LayoutEngine engine;
+                if (test_num >= 1 && test_num <= 8) {
+            		engine = LayoutEngine.builder()
+		                .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
+		                .build();
+                }
+                else {
+                    // Test 9 uses fixed node size
+            		engine = LayoutEngine.builder()
+                        .setNodeSizeFixed(new double[] {50, 50})
+                        .build();
+                }
+    			engine.layout(tree);
+    			assertFalse(overlap(tree));
 
                 String expected_name = "after-" + test_num + ".json";
                 Tree expected = Tree.fromJson(getFile(expected_name));

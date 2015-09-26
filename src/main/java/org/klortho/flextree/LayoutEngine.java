@@ -1,7 +1,5 @@
 package org.klortho.flextree;
 
-import org.klortho.flextree.LayoutEngine.NodeSizeFunction;
-
 /**
  * The extended Reingold-Tilford algorithm as described in the paper
  * "Drawing Non-layered Tidy Trees in Linear Time" by Atze van der Ploeg
@@ -46,6 +44,13 @@ public class LayoutEngine {
 	public static final TreeRelation defaultSpacing = NULL_TREE_RELATION;
 	TreeRelation spacing = defaultSpacing;
 	
+	// NodeSizeFixed
+	public static final double[] NULL_NODE_SIZE_FIXED =
+			new double[] {0.0, 0.0};
+	public static final double[] defaultNodeSizeFixed = NULL_NODE_SIZE_FIXED;
+	double[] nodeSizeFixed = defaultNodeSizeFixed;
+	
+	
 	// NodeSizeFunction - returns an array [x_size, y_size]
 	public interface NodeSizeFunction {
 		abstract double[] ns(Tree t);
@@ -85,13 +90,20 @@ public class LayoutEngine {
 			separation = NULL_TREE_RELATION;
 			return this;
 		}
+		public Builder setNodeSizeFixed(double[] nsf) {
+			nodeSizeFixed = nsf;
+			nodeSizeFunction = NULL_NODE_SIZE_FUNCTION;
+			return this;
+		}
 		public Builder setNodeSizeFunction(NodeSizeFunction nsf) {
 			nodeSizeFunction = nsf;
+			nodeSizeFixed = NULL_NODE_SIZE_FIXED;
 			return this;
 		}
 		
 		private TreeRelation separation = defaultSeparation;
 		private TreeRelation spacing = defaultSpacing;
+		private double[] nodeSizeFixed = defaultNodeSizeFixed;
 		private NodeSizeFunction nodeSizeFunction = defaultNodeSizeFunction;
 	}
 	
@@ -112,6 +124,7 @@ public class LayoutEngine {
 	public LayoutEngine(Builder b) {
 		separation = b.separation;
 		spacing = b.spacing;
+		nodeSizeFixed = b.nodeSizeFixed;
 		nodeSizeFunction = b.nodeSizeFunction;
 	}
 	
@@ -147,16 +160,20 @@ public class LayoutEngine {
 			
 			// Set the size attributes of this node, based on whatever method was selected
 			// by the user.
-			if (nodeSizeFunction == NULL_NODE_SIZE_FUNCTION) {
+			if (nodeSizeFixed != NULL_NODE_SIZE_FIXED) {
+				this.x_size = nodeSizeFixed[0];
+				this.y_size = nodeSizeFixed[1];
+			}
+			else if (nodeSizeFunction != NULL_NODE_SIZE_FUNCTION) {
+    			double[] nodeSize = nodeSizeFunction.ns(t);
+    			this.x_size = nodeSize[0];
+    			this.y_size = nodeSize[1];
+			}
+			else {
 				// FIXME: this should use fixed node size, or size, but those aren't implemented
 				// yet.
 				this.x_size = t.x_size;
 				this.y_size = t.y_size;
-			}
-			else {
-    			double[] nodeSize = nodeSizeFunction.ns(t);
-    			this.x_size = nodeSize[0];
-    			this.y_size = nodeSize[1];
 			}
 
 		    children = new WrappedTree[t.children.size()];
