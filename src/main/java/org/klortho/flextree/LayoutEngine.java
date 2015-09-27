@@ -9,7 +9,9 @@ package org.klortho.flextree;
  * appreciated!
  * 
  * This LayoutEngine sets the x and y coordinates for every node in the tree such that:
- * - minimum x and minimum y are both 0.
+ * - x coordinate of a node specifies the center of the node, horizontally. 
+ * - y coordinate specifies the top edge
+ * - the root's coordinates are [0, 0]
  * 
  * Instantiate one of these with either:
  * - LayoutEngine engine = new LayoutEngine();   // to use all defaults
@@ -27,11 +29,6 @@ public class LayoutEngine {
 		abstract double s(Tree a, Tree b);
 	}
 	
-	// This is a sentinal value for separation and spacing, meaning not set
-	public static final TreeRelation NULL_TREE_RELATION = new TreeRelation() {
-		public double s(Tree a, Tree b) { return 0.0; }
-	};
-
 	// Separation
 	public static final TreeRelation defaultSeparation = new TreeRelation() {
 		public double s(Tree a, Tree b) {
@@ -41,27 +38,22 @@ public class LayoutEngine {
 	TreeRelation separation = defaultSeparation;
 	
 	// Spacing
-	public static final TreeRelation defaultSpacing = NULL_TREE_RELATION;
+	public static final TreeRelation defaultSpacing = null;
 	TreeRelation spacing = defaultSpacing;
 	
 	// Size
-	public static final double[] NULL_SIZE = new double[] {0.0, 0.0};
 	public static final double[] defaultSize = new double[] {1.0, 1.0};
 	double[] size = defaultSize;
 
 	// NodeSizeFixed
-	public static final double[] defaultNodeSizeFixed = NULL_SIZE;
+	public static final double[] defaultNodeSizeFixed = null;
 	double[] nodeSizeFixed = defaultNodeSizeFixed;
 
 	// NodeSizeFunction - returns an array [x_size, y_size]
 	public interface NodeSizeFunction {
 		abstract double[] ns(Tree t);
 	}
-	public static final NodeSizeFunction NULL_NODE_SIZE_FUNCTION = 
-		new NodeSizeFunction() {
-		    public double[] ns(Tree t) { return new double[2]; }
-        };
-    public static final NodeSizeFunction defaultNodeSizeFunction = NULL_NODE_SIZE_FUNCTION;
+    public static final NodeSizeFunction defaultNodeSizeFunction = null;
     NodeSizeFunction nodeSizeFunction = defaultNodeSizeFunction;
     
     // This node size function is defined for convenience -- it gets the node size from
@@ -81,30 +73,30 @@ public class LayoutEngine {
 		}
 		public Builder setSeparation(TreeRelation s) {
 			separation = s;
-			spacing = NULL_TREE_RELATION;
+			spacing = null;
 			return this;
 		}
 		public Builder setSpacing(TreeRelation s) {
 			spacing = s;
-			separation = NULL_TREE_RELATION;
+			separation = null;
 			return this;
 		}
 		public Builder setSize(double[] s) {
 			size = s;
-			nodeSizeFixed = NULL_SIZE;
-			nodeSizeFunction = NULL_NODE_SIZE_FUNCTION;
+			nodeSizeFixed = null;
+			nodeSizeFunction = null;
 			return this;
 		}
 		public Builder setNodeSizeFixed(double[] nsf) {
 			nodeSizeFixed = nsf;
-			size = NULL_SIZE;
-			nodeSizeFunction = NULL_NODE_SIZE_FUNCTION;
+			size = null;
+			nodeSizeFunction = null;
 			return this;
 		}
 		public Builder setNodeSizeFunction(NodeSizeFunction nsf) {
 			nodeSizeFunction = nsf;
-			size = NULL_SIZE;
-			nodeSizeFixed = NULL_SIZE;
+			size = null;
+			nodeSizeFixed = null;
 			return this;
 		}
 		
@@ -169,11 +161,11 @@ public class LayoutEngine {
 			
 			// Set the size attributes of this node, based on whatever method was selected
 			// by the user.
-			if (size != NULL_SIZE) {
+			if (size != null) {
 				this.x_size = 1;
 				this.y_size = 1;
 			}
-			else if (nodeSizeFixed != NULL_SIZE) {
+			else if (nodeSizeFixed != null) {
 				this.x_size = nodeSizeFixed[0];
 				this.y_size = nodeSizeFixed[1];
 			}
