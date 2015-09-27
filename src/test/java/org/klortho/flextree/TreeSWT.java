@@ -101,8 +101,10 @@ public class TreeSWT
 		}
 		public double x() { return tree.x + delta_x; }
 		public double y() { return tree.y; }
-		public double width() { return tree.x_size; }
-		public double height() { return tree.y_size; }
+		public double x_size() { return tree.x_size; }
+		public double y_size() { return tree.y_size; }
+		public double x_min() { return x() - x_size()/2; }
+		public double x_max() { return x() + x_size()/2; }
 	}
 	
 	private void autoZoom() {
@@ -113,7 +115,7 @@ public class TreeSWT
 		double sum_area = 0;
 		double min_x_size = t.x_size;
 		double min_y_size = t.y_size;
-		double min_x = 0;
+		double min_x = 0 - t.x_size/2;
 		Stack<Tree> toVisit = new Stack<Tree>();
 		toVisit.add(t);
 		while (toVisit.size() > 0) {
@@ -124,7 +126,7 @@ public class TreeSWT
 			sum_area += node.x_size * node.y_size;
 			min_x_size = Math.min(min_x_size, node.x_size);
 			min_y_size = Math.min(min_y_size, node.y_size);
-			min_x = Math.min(min_x, node.x);
+			min_x = Math.min(min_x, node.x - node.x_size/2);
 			toVisit.addAll(node.children);
 		}
 		// Adjust zoom so that the average area is 5000 sq pixels
@@ -146,7 +148,7 @@ public class TreeSWT
 	private void render() {
 		autoZoom();
 		
-		BoundingBox b = t.getBoundingBox();
+		BoundingBox b = new BoundingBox(t);
 		width = b.x_size();
 		height = b.y_size();		
 		wt = new WrappedTree(t);
@@ -197,30 +199,33 @@ public class TreeSWT
 	
 	void paintTree(WrappedTree wt, GC gc, Rectangle r) {
 		Color c = new Color(gc.getDevice(), wt.rgb);
+
 		gc.setBackground(c);
-		gc.fillRectangle(roundInt(zoom * (wt.x() + hgap / 2 - xOffset)), 
-				         roundInt(zoom * (wt.y() + vgap / 2 - yOffset)), 
-				         roundInt(zoom * (wt.width() - hgap)), 
-				         roundInt(zoom * (wt.height() - vgap)));
+		gc.fillRectangle(roundInt(zoom * (wt.x_min() + hgap / 2 - xOffset)), 
+	    		         roundInt(zoom * (wt.y() + vgap / 2 - yOffset)), 
+		  	             roundInt(zoom * (wt.x_size() - hgap)), 
+		     	         roundInt(zoom * (wt.y_size() - vgap)));
+		
 		gc.setAlpha(255);
-		gc.drawRectangle(roundInt(zoom * (wt.x() + hgap / 2 - xOffset)), 
-				         roundInt(zoom * (wt.y() + vgap / 2 - yOffset)), 
-				         roundInt(zoom * (wt.width() - hgap)), 
-				         roundInt(zoom * (wt.height() - vgap)));
+		gc.drawRectangle(roundInt(zoom * (wt.x_min() + hgap / 2 - xOffset)), 
+			             roundInt(zoom * (wt.y() + vgap / 2 - yOffset)), 
+			             roundInt(zoom * (wt.x_size() - hgap)), 
+			             roundInt(zoom * (wt.y_size() - vgap)));
+
 		c.dispose();
 
 		if (wt.children.length > 0) {
-			double endYRoot = wt.y() + wt.height() - vgap / 2 ;
-			double rootMiddle = wt.x() + wt.width() / 2.0;
+			double endYRoot = wt.y() + wt.y_size() - vgap / 2 ;
+			double rootMiddle = wt.x();
 			double middleY = endYRoot + vgap / 2;
 			gc.drawLine(roundInt(zoom * (rootMiddle - xOffset)), 
 					    roundInt(zoom * (endYRoot - yOffset)), 
 					    roundInt(zoom * (rootMiddle - xOffset)),
 					    roundInt(zoom * (middleY - yOffset)) );
 			WrappedTree firstKid = wt.children[0];
-			double middleFirstKid =  firstKid.x() + firstKid.width() / 2.0;
+			double middleFirstKid =  firstKid.x();
 			WrappedTree lastKid = wt.children[wt.children.length - 1];
-			double middleLastKid = lastKid.x() + lastKid.width() / 2.0;
+			double middleLastKid = lastKid.x();
 			gc.drawLine(roundInt(zoom * (middleFirstKid - xOffset)), 
 					    roundInt(zoom * (middleY - yOffset)), 
 					    roundInt(zoom * (rootMiddle - xOffset)),
@@ -231,7 +236,7 @@ public class TreeSWT
 					    roundInt(zoom * (middleY - yOffset)));
 			
 			for (WrappedTree kid : wt.children) {
-				double middleKid = kid.x() + kid.width() / 2.0;
+				double middleKid = kid.x();
 				paintTree(kid, gc, r);
 				gc.drawLine(roundInt(zoom * (middleKid - xOffset)), 
 						    roundInt(zoom * (middleY - yOffset)), 

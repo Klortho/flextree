@@ -12,13 +12,15 @@ import org.klortho.flextree.TreeTestCases.TreeTestCase;
  * Usage:
  * - With no arguments, it generates a random tree
  * - With a single string argument, it renders the tree in that JSON file
- * - --test <test-name> - renders the tree in that test.
+ * - --test <test-name> - lays out that test tree, and renders it
+ * - --expected <test-name> - renders the expected tree (without laying it out)
  */
-public class Main {
+public class Render {
 	static Tree t;
 	static LayoutEngine engine;
 	static TreeGenerator treeGenerator;
 	static TreeTestCases testCases;
+	static boolean doLayout = true;
 	
 	public static void main(String argv[]) {
 		try {
@@ -34,30 +36,52 @@ public class Main {
 			}
 			else if (argv[0].equals("--test")) {
 				String test_name = argv[1];
-
+				TreeTestCase tc = testCases.getTestCase(test_name);
+				if (tc == null) {
+					System.err.println("No test found with that name");
+					System.exit(1);
+				}				
+				treeGenerator = new TreeGenerator() {
+					public Tree makeTree() {
+						try {
+    						return tc.getTreeData();
+						}
+						catch (IOException e) {
+							return null;
+						}
+					}
+				};
+			}
+			else if (argv[0].equals("--expected")) {
+				String test_name = argv[1];
 				TreeTestCase tc = testCases.getTestCase(test_name);
 				if (tc == null) {
 					System.err.println("No test found with that name");
 					System.exit(1);
 				}
-				
 				treeGenerator = new TreeGenerator() {
 					public Tree makeTree() {
 						try {
     						return tc.getExpected();
 						}
 						catch (IOException e) {
-							return Tree.NULL;
+							return null;
 						}
 					}
 				};
+				doLayout = false;
 			}
-			engine = LayoutEngine.builder()
-				     .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
-				     .build();
-			
+
 			t = treeGenerator.makeTree();
-			engine.layout(t);
+			if (doLayout) {
+				engine = LayoutEngine.builder()
+						 .setSetNodeSizes(true)
+					     .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
+					     .build();
+    			engine.layout(t);
+			}
+			
+			System.out.println("Writing layed out tree data to 'after.json'.");
 			PrintWriter out = new PrintWriter("after.json");
 			out.println(t.toJson());
 			out.close();
@@ -67,7 +91,7 @@ public class Main {
 			KeyHandler z_handler = new KeyHandler() {
 				public void execute(RenderSWT r) {
 					Tree t = treeGenerator.makeTree();
-					engine.layout(t);
+					if (doLayout) engine.layout(t);
 					r.rerender(t);
 				}
 			};

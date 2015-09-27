@@ -14,7 +14,7 @@ public class FileTreeGenerator implements TreeGenerator {
 	}
 	
 	public Tree makeTree() {
-		Tree t = Tree.NULL;
+		Tree t = null;
 		try {
 			t = Tree.fromJson(new File(filename));
 		}

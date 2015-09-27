@@ -5,7 +5,7 @@ package org.klortho.flextree;
  * (numNodes) up to MAX_SIZE, stepping in intervals of INCREMENT, this runs
  * NUM_TESTS tests.
  */
-public class Measure {
+public class PerformanceCheck {
 
 	public static int MAX_SIZE = 10000;
 	public static int INCREMENT = 100;
@@ -42,6 +42,4 @@ public class Measure {
 		}
 		return 0;
 	}
-
-	
 }

@@ -63,6 +63,10 @@ public class LayoutEngine {
 			return new double[] {t.x_size, t.y_size};
 		}
 	};
+	
+	// If this is set to true, then the layout engine will set the x_size and y_size
+	// attributes on each tree node.
+	boolean setNodeSizes = false;
 
     
 
@@ -99,12 +103,17 @@ public class LayoutEngine {
 			nodeSizeFixed = null;
 			return this;
 		}
+		public Builder setSetNodeSizes(boolean sns) {
+			setNodeSizes = sns;
+			return this;
+		}
 		
 		private TreeRelation separation = defaultSeparation;
 		private TreeRelation spacing = defaultSpacing;
 		private double[] size = defaultSize;
 		private double[] nodeSizeFixed = defaultNodeSizeFixed;
 		private NodeSizeFunction nodeSizeFunction = defaultNodeSizeFunction;
+		private boolean setNodeSizes = false;
 	}
 	
 	public static Builder builder() {
@@ -127,14 +136,18 @@ public class LayoutEngine {
 		size = b.size;
 		nodeSizeFixed = b.nodeSizeFixed;
 		nodeSizeFunction = b.nodeSizeFunction;
+		setNodeSizes = b.setNodeSizes;
 	}
 	
 	/**
 	 * Does the layout, setting the following attributes on each Tree node:
-	 * parent - the parent node, or null for the root.
-	 * depth - the depth of the node, starting at 0 for the root.
-	 * x - the computed x-coordinate of the node position.
-	 * y - the computed y-coordinate of the node position.
+	 *   - parent - the parent node, or null for the root.
+	 *   - depth - the depth of the node, starting at 0 for the root.
+	 *   - x - the computed x-coordinate of the node position.
+	 *   - y - the computed y-coordinate of the node position.
+	 * Additionally, if setNodeSizes is true, this will set
+	 *   - x_size
+	 *   - y_size
 	 */
 	public void layout(Tree t) { 
 		WrappedTree wt = new WrappedTree(t);
@@ -162,17 +175,22 @@ public class LayoutEngine {
 			// Set the size attributes of this node, based on whatever method was selected
 			// by the user.
 			if (size != null) {
-				this.x_size = 1;
-				this.y_size = 1;
+				x_size = 1;
+				y_size = 1;
 			}
 			else if (nodeSizeFixed != null) {
-				this.x_size = nodeSizeFixed[0];
-				this.y_size = nodeSizeFixed[1];
+				x_size = nodeSizeFixed[0];
+				y_size = nodeSizeFixed[1];
 			}
 			else {  // use nodeSizeFunction
     			double[] nodeSize = nodeSizeFunction.ns(t);
-    			this.x_size = nodeSize[0];
-    			this.y_size = nodeSize[1];
+    			x_size = nodeSize[0];
+    			y_size = nodeSize[1];
+			}
+			
+			if (setNodeSizes) {
+				t.x_size = x_size;
+				t.y_size = y_size;
 			}
 
 		    children = new WrappedTree[t.children.size()];
@@ -270,11 +288,11 @@ public class LayoutEngine {
 	}
 	  
 	void seperate(WrappedTree t, int i, IYL ih) {
-	    // Right contour node of left siblings and its sum of modfiers.  
+	    // Right contour node of left siblings and its sum of modifiers.  
 	    WrappedTree sr = t.children[i-1]; 
 	    double mssr = sr.mod;
 	   
-	    // Left contour node of current subtree and its sum of modfiers.  
+	    // Left contour node of current subtree and its sum of modifiers.  
 	    WrappedTree cl = t.children[i]; 
 	    double mscl = cl.mod;
 	   
@@ -282,7 +300,8 @@ public class LayoutEngine {
 		    if (bottom(sr) > ih.lowY) ih = ih.nxt;
 		  
 		    // How far to the left of the right side of sr is the left side of cl?  
-		    double dist = (mssr + sr.prelim + sr.x_size()) - (mscl + cl.prelim);
+		    //double dist = (mssr + sr.prelim + sr.x_size()) - (mscl + cl.prelim);
+		    double dist = (mssr + sr.prelim + sr.x_size()/2) - (mscl + cl.prelim - cl.x_size()/2);
 		    if (dist > 0) {
 		        mscl += dist;
 		        moveSubtree(t, i, ih.index, dist);
@@ -361,9 +380,7 @@ public class LayoutEngine {
 	    wt.prelim = ( wt.children[0].prelim + 
 	 		          wt.children[0].mod + 
  			          wt.children[wt.num_children - 1].mod + 
-                      wt.children[wt.num_children - 1].prelim + 
-                      wt.children[wt.num_children - 1].x_size() ) / 2 
-			        - wt.x_size() / 2;
+                      wt.children[wt.num_children - 1].prelim ) / 2;
 	}
 
 	void secondWalk(WrappedTree t, double modsum) {
@@ -421,14 +438,6 @@ public class LayoutEngine {
         moveRight(wt, -rootX);
 	}
 
-	double getMinX(WrappedTree wt) {
-		double minX = wt.x();
-		for (WrappedTree child : wt.children) {
-			minX = Math.min(getMinX(child), minX);
-		}
-		return minX;
-	}
-	
 	public void moveRight(WrappedTree wt, double move) {
 		wt.x(wt.x() + move);
 		for (WrappedTree child : wt.children) {

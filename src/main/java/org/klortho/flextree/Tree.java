@@ -9,16 +9,14 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @JsonIgnoreProperties({ "boundingBox", "minX", "depth", "parent" })
+@JsonPropertyOrder({ "x", "y", "x_size", "y_size", "children" })
 public final class Tree {
-	// Note that not every Tree uses x_size and y_size. They are only used
-	// when laying out the tree, and the layout engine is using the
-	// defaultNodeSizeFunction
-	public double x_size, y_size;
 	
 	public Vector<Tree> children;
 	
@@ -27,15 +25,19 @@ public final class Tree {
 	public int depth;
 	public double x, y;
 
+	// Note that not every Tree uses x_size and y_size. They are only used
+	// when laying out the tree, and the layout engine is using the
+	// defaultNodeSizeFunction.  If you set setNodeSizes to true on the layout 
+	// engine, then it will set these values to those that it used during the 
+	// layout.
+	public double x_size, y_size;
+
     public static ObjectMapper json_mapper;
     static {
         json_mapper = new ObjectMapper();
         json_mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    // Sentinel value used for the parent of the root
-    public static Tree NULL = new Tree();
-    
     /**
      * Default constructor is needed by Jackson, to enable reading in
      * objects from JSON.
@@ -44,17 +46,21 @@ public final class Tree {
         this.x_size = 1.0;
         this.y_size = 1.0;
         this.children = new Vector<Tree>();
-        this.parent = NULL;
+        this.parent = null;
         this.x = 0;
         this.y = 0;
     }
 
+    /**
+     * This constructor is used for testing, as it provides a nice clean way of creating
+     * the hierarchical test tree.
+     */
     public Tree(double x_size, double y_size, Tree ... children) {
 		this.x_size = x_size;
 		this.y_size = y_size;
 		this.children = new Vector<Tree>();
 		this.children.addAll(Arrays.asList(children));
-        this.parent = NULL;
+        this.parent = null;
 	}
 
     /**
@@ -76,26 +82,24 @@ public final class Tree {
     }
 
 
-	public BoundingBox getBoundingBox() {
-		return new BoundingBox(this);
-	}
-	
-	
 	/**
 	 * Get the total number of nodes in this tree.
 	 */
 	public int size() {
-		int res = 1;
+		int n = 1;
 		for (Tree node : children) {
-			res += node.size();
+			n += node.size();
 		}
-		return res;
+		return n;
 	}
 	
 	public boolean hasChildren() {
 		return children.size() > 0;
 	}
 	
+	/**
+	 * Get a list of all of the nodes in the tree, in depth-first order.
+	 */
 	public ArrayList<Tree> allNodes() {
 		ArrayList<Tree> nodes = new ArrayList<Tree>();
 		nodes.add(this);
@@ -106,15 +110,16 @@ public final class Tree {
 	}
 	
 	public int getDepth() {
-		int res = 1;
+		int d = 1;
 		for (Tree child : children) {
-			res = Math.max(res, child.getDepth() + 1);
+			d = Math.max(d, child.getDepth() + 1);
 		}
-		return res;
+		return d;
 	}
 	
 	/**
-	 * Print out the Tree in Java format.
+	 * Print out the Tree in Java format (result can be pasted into Java code
+	 * as a constructor).
 	 */
 	public void print() {
 		print(0);
@@ -144,67 +149,28 @@ public final class Tree {
 		return deepEquals(other, ps);
     }
 
+    /**
+     * Same thing, but if there's a mismatch, then information about it will be written
+     * to the PrintStream.
+     */
     public boolean deepEquals(Tree other, PrintStream ps) {
-        if (//x_size != other.x_size ||
-            //y_size != other.y_size ||
-            x != other.x ||
+        if (x != other.x ||
             y != other.y ||
             children.size() != other.children.size()) //return false;
         {
         	ps.println("mismatch:\n" +
-            		//"x_size: " + x_size + " <=> " + other.x_size + "\n" +
-            		//"y_size: " + y_size + " <=> " + other.y_size + "\n" +
             		"x: " + x + " <=> " + other.x + "\n" +
-            		"y: " + y + " <=> " + other.y + "\n"
+            		"y: " + y + " <=> " + other.y + "\n" +
+            		"number of children: " + children.size() + " <=> " + other.children.size() + "\n"
             );
         	return false;
         }
 
         for (int i = 0; i < children.size(); ++i) {
-            if (!children.get(i).deepEquals(other.children.get(i))) return false;
+            if (!children.get(i).deepEquals(other.children.get(i), ps)) return false;
         }
 
         return true;
     }
-
-	/**
-	 * Test to see if the tree has any overlaps among its nodes. Returns true if there
-	 * is any overlap.
-	 */
-	public boolean hasOverlappingNodes() {
-		// dummy PrintStream -- output will not be used.
-		PrintStream ps = new PrintStream(new ByteArrayOutputStream());
-		return hasOverlappingNodes(ps);
-	}
-	
-	/**
-	 * Same as hasOverlappingNodes(), but if an overlapping node is encountered, a message
-	 * about it is written to the PrintStream.
-	 */
-	public boolean hasOverlappingNodes(PrintStream ps) {
-		ArrayList<Tree> nodes = this.allNodes();
-		for (int i = 0 ; i < nodes.size(); i++) {
-			for (int j = 0 ; j < i ; j++) {
-				if (nodeOverlaps(nodes.get(i), nodes.get(j))) {
-					ps.printf("Overlap %d %d!!\n", i, j);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private static boolean overlap(double xStart, double xEnd, 
-                                   double xStart2, double xEnd2) 
-	{
-        return (xStart2 < xEnd && xEnd2 > xStart) ||
-               (xStart < xEnd2 && xEnd > xStart2);
-	}
-	
-	private static boolean nodeOverlaps(Tree a, Tree b) {
-        return overlap(a.x, a.x + a.x_size, b.x , b.x + b.x_size) &&
-               overlap(a.y, a.y + a.y_size, b.y, b.y + b.y_size);
-	}
-
 
 }

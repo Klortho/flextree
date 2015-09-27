@@ -11,14 +11,18 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 
-public class FlextreeTest extends TestCase {
+/**
+ * When testing, always set the setNodeSizes attribute on the layout engine to true,
+ * so that we can have access to the same node sizes that the layout engine used.
+ */
+public class UnitTests extends TestCase {
 
     /**
      * Create the test case
      *
      * @param testName name of the test case
      */
-    public FlextreeTest( String testName )
+    public UnitTests( String testName )
     {
         super( testName );
     }
@@ -28,7 +32,7 @@ public class FlextreeTest extends TestCase {
      */
     public static Test suite()
     {
-        return new TestSuite( FlextreeTest.class );
+        return new TestSuite( UnitTests.class );
     }
     
 
@@ -116,6 +120,7 @@ public class FlextreeTest extends TestCase {
 	// the x_size and y_size attributes of each tree node.
 	public void layoutAndCheckTree(Tree t) {
 		LayoutEngine engine = LayoutEngine.builder()
+				                  .setSetNodeSizes(true)
 			                      .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
 			                      .build();
     	engine.layout(t);
@@ -140,7 +145,7 @@ public class FlextreeTest extends TestCase {
 	}
 	
 	public static void checkOverlap(Tree t, StringPrintStream out) {
-		boolean has = t.hasOverlappingNodes(out.ps);
+		boolean has = TestUtils.hasOverlappingNodes(t, out.ps);
 		if (has) {
 			String msg = out.toString();
 			System.out.println(msg);
@@ -183,8 +188,9 @@ public class FlextreeTest extends TestCase {
 
                 Tree tree = testCase.getTreeData();
                 //tree.print();
-                LayoutEngine.Builder b = LayoutEngine.builder();
-
+                LayoutEngine.Builder b = LayoutEngine.builder()
+                		                     .setSetNodeSizes(true);
+                
                 if (testCase.sizing.equals("node-size-function")) {
     		        b.setNodeSizeFunction(LayoutEngine.nodeSizeFromTree);
                 }
