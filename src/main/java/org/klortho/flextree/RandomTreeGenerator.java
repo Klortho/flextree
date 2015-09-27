@@ -3,7 +3,7 @@ package org.klortho.flextree;
 import java.util.Random;
 
 
-public class RandomTreeGenerator {
+public class RandomTreeGenerator implements TreeGenerator {
 	Random rand;
 	public int numNodes;
 	double minWidth, maxWidth;
@@ -17,7 +17,7 @@ public class RandomTreeGenerator {
 	{
 		RandomTreeGenerator g = new RandomTreeGenerator(numNodes, minWidth, 
 				maxWidth, minHeight, maxHeight, seed);
-		return g.randomTree();
+		return g.makeTree();
 	}
 	
 	/**
@@ -40,7 +40,7 @@ public class RandomTreeGenerator {
 	 * Return a random tree with a set number of nodes. Each node has a random 
 	 * width and height, and is placed randomly into the tree.
 	 */
-	public Tree randomTree() {
+	public Tree makeTree() {
 		Tree root = randomNode();
 		for (int i = 0 ; i < numNodes - 1 ; i++) {
 			randExpand(root, randomNode());

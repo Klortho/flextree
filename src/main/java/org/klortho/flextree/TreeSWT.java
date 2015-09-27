@@ -1,5 +1,6 @@
 package org.klortho.flextree;
 import java.util.Random;
+import java.util.Stack;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
@@ -100,11 +101,41 @@ public class TreeSWT
 		public double height() { return tree.y_size; }
 	}
 	
+	private void autoZoom() {
+		// Compute the average width
+		double num_nodes = 0;
+		double sum_x_size = 0;
+		double sum_y_size = 0;
+		double min_x_size = t.x_size;
+		double min_y_size = t.y_size;
+		Stack<Tree> toVisit = new Stack<Tree>();
+		toVisit.add(t);
+		while (toVisit.size() > 0) {
+			Tree node = toVisit.pop();
+			num_nodes++;
+			sum_x_size += node.x_size;
+			sum_y_size += node.y_size;
+			min_x_size = Math.min(min_x_size, node.x_size);
+			min_y_size = Math.min(min_y_size, node.y_size);
+			toVisit.addAll(node.children);
+		}
+		// Adjust zoom so that the average width is 20 pixels
+		double ave_x_size = sum_x_size / num_nodes;
+		double ave_y_size = sum_y_size / num_nodes;
+		zoom = 50 / ave_x_size;
+		// The hgap should be 10% of the average x-size, or the min x-size, whichever
+		// is less
+		hgap = Math.min(ave_x_size / 10, min_x_size);
+		vgap = Math.min(ave_y_size / 10, min_y_size);
+	}
+
 	/**
 	 * Render the Tree. This is called both from the constructor and from the
 	 * rerender() method.
 	 */
 	private void render() {
+		autoZoom();
+		
 		BoundingBox b = t.getBoundingBox();
 		width = b.width;
 		height = b.height;		

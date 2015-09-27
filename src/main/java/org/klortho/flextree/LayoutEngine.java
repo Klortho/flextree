@@ -426,7 +426,7 @@ public class LayoutEngine {
 	 */
 	void normalizeX(WrappedTree wt) {
 		double minX = getMinX(wt);
-		moveRight(wt, -minX);
+        moveRight(wt, -minX);
 	}
 
 	double getMinX(WrappedTree wt) {

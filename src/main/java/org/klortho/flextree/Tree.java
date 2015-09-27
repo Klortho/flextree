@@ -142,15 +142,21 @@ public final class Tree {
 	 * true if they are equal, false if not.
 	 */
     public boolean deepEquals(Tree other) {
+		// dummy PrintStream -- output will not be used.
+		PrintStream ps = new PrintStream(new ByteArrayOutputStream());
+		return deepEquals(other, ps);
+    }
+
+    public boolean deepEquals(Tree other, PrintStream ps) {
         if (x_size != other.x_size ||
             y_size != other.y_size ||
             x != other.x ||
             y != other.y ||
             children.size() != other.children.size()) //return false;
         {
-        	System.out.println("mismatch:\n" +
-            		"width: " + x_size + " <=> " + other.x_size + "\n" +
-            		"height: " + y_size + " <=> " + other.y_size + "\n" +
+        	ps.println("mismatch:\n" +
+            		"x_size: " + x_size + " <=> " + other.x_size + "\n" +
+            		"y_size: " + y_size + " <=> " + other.y_size + "\n" +
             		"x: " + x + " <=> " + other.x + "\n" +
             		"y: " + y + " <=> " + other.y + "\n"
             );

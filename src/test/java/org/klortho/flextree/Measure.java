@@ -36,7 +36,7 @@ public class Measure {
 
 	static long runTests(RandomTreeGenerator gen, int numTests) {
 		for (int i = 0 ; i < numTests * gen.numNodes ; i++) {
-			Tree t = gen.randomTree();
+			Tree t = gen.makeTree();
 			long nanoseconds = timeLayout(t);
 			System.out.printf("%d %d\n", gen.numNodes, nanoseconds);
 		}

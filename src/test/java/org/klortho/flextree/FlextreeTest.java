@@ -199,15 +199,15 @@ public class FlextreeTest extends TestCase {
     {
         try {
         	List<TestCase> test_cases = TestCase.json_mapper.readValue(
-        			getFile("tests.json"),
+        			getFile("test-cases/tests.json"),
         			new TypeReference<List<TestCase>>() { } );
         	//System.out.println("num test_cases = " + test_cases.size());
         	
         	for (TestCase test_case : test_cases) {
         		StringPrintStream out = new StringPrintStream();
         		out.ps.print("Test " + test_case.name + ": ");
-        		
-                Tree tree = Tree.fromJson(getFile(test_case.tree));
+
+                Tree tree = Tree.fromJson(getFile("test-cases/" + test_case.tree));
                 //tree.print();
                 LayoutEngine.Builder b = LayoutEngine.builder();
 
@@ -217,13 +217,17 @@ public class FlextreeTest extends TestCase {
                 else if (test_case.sizing.equals("node-size-fixed")) {
                     b.setNodeSizeFixed(new double[] {50, 50});
                 }
+                else {
+                	// FIXME: need to implement this
+                	continue;
+                }
    		        LayoutEngine engine = b.build();
                 
     			engine.layout(tree);
     			checkOverlap(tree, out);
 
                 String expected_name = test_case.name + ".expected.json";
-                Tree expected = Tree.fromJson(getFile(expected_name));
+                Tree expected = Tree.fromJson(getFile("test-cases/" + expected_name));
 
                 boolean success = tree.deepEquals(expected);
                 if (!success) {
