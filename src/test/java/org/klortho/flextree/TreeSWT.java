@@ -102,10 +102,11 @@ public class TreeSWT
 	}
 	
 	private void autoZoom() {
-		// Compute the average width
+		// Compute the averages
 		double num_nodes = 0;
 		double sum_x_size = 0;
 		double sum_y_size = 0;
+		double sum_area = 0;
 		double min_x_size = t.x_size;
 		double min_y_size = t.y_size;
 		Stack<Tree> toVisit = new Stack<Tree>();
@@ -115,14 +116,16 @@ public class TreeSWT
 			num_nodes++;
 			sum_x_size += node.x_size;
 			sum_y_size += node.y_size;
+			sum_area += node.x_size * node.y_size;
 			min_x_size = Math.min(min_x_size, node.x_size);
 			min_y_size = Math.min(min_y_size, node.y_size);
 			toVisit.addAll(node.children);
 		}
-		// Adjust zoom so that the average width is 20 pixels
+		// Adjust zoom so that the average area is 5000 sq pixels
 		double ave_x_size = sum_x_size / num_nodes;
 		double ave_y_size = sum_y_size / num_nodes;
-		zoom = 50 / ave_x_size;
+		double ave_area = sum_area / num_nodes;
+		zoom = Math.sqrt(5000 / ave_area);
 		// The hgap should be 10% of the average x-size, or the min x-size, whichever
 		// is less
 		hgap = Math.min(ave_x_size / 10, min_x_size);

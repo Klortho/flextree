@@ -1,13 +1,10 @@
 package org.klortho.flextree;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
-import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import org.klortho.flextree.TreeTestCases.TreeTestCase;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -15,8 +12,6 @@ import junit.framework.TestSuite;
 
 
 public class FlextreeTest extends TestCase {
-
-    private ClassLoader classLoader;
 
     /**
      * Create the test case
@@ -26,7 +21,6 @@ public class FlextreeTest extends TestCase {
     public FlextreeTest( String testName )
     {
         super( testName );
-        classLoader = getClass().getClassLoader();
     }
 
     /**
@@ -172,49 +166,29 @@ public class FlextreeTest extends TestCase {
     	layoutAndCheckTree(t);
     }
     
-    /*
-     * The bulk of our tests will be read from the tests.json file. This class holds
-     * the data from one of the objects in the list from that file.
-     */
-    public static class TestCase {
-    	public String name;
-    	public String description;
-    	public String tree;
-    	public String sizing;
-    	public String gap;
-    	public TestCase() {}
-
-        public static ObjectMapper json_mapper;
-        static {
-            json_mapper = new ObjectMapper();
-            json_mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        }
-    }
-
     /**
      * Test the layout algorithm against the collection of
      * tests in test/resources/tests.json
      */
+
     public void testApp()
     {
         try {
-        	List<TestCase> test_cases = TestCase.json_mapper.readValue(
-        			getFile("test-cases/tests.json"),
-        			new TypeReference<List<TestCase>>() { } );
-        	//System.out.println("num test_cases = " + test_cases.size());
+        	TreeTestCases testCases = new TreeTestCases();
         	
-        	for (TestCase test_case : test_cases) {
+        	
+        	for (TreeTestCase testCase : testCases.cases) {
         		StringPrintStream out = new StringPrintStream();
-        		out.ps.print("Test " + test_case.name + ": ");
+        		out.ps.print("Test " + testCase.name + ": ");
 
-                Tree tree = Tree.fromJson(getFile("test-cases/" + test_case.tree));
+                Tree tree = testCase.getTreeData();
                 //tree.print();
                 LayoutEngine.Builder b = LayoutEngine.builder();
 
-                if (test_case.sizing.equals("node-size-function")) {
+                if (testCase.sizing.equals("node-size-function")) {
     		        b.setNodeSizeFunction(LayoutEngine.nodeSizeFromTree);
                 }
-                else if (test_case.sizing.equals("node-size-fixed")) {
+                else if (testCase.sizing.equals("node-size-fixed")) {
                     b.setNodeSizeFixed(new double[] {50, 50});
                 }
                 else {
@@ -226,8 +200,7 @@ public class FlextreeTest extends TestCase {
     			engine.layout(tree);
     			checkOverlap(tree, out);
 
-                String expected_name = test_case.name + ".expected.json";
-                Tree expected = Tree.fromJson(getFile("test-cases/" + expected_name));
+                Tree expected = testCase.getExpected(); 
 
                 boolean success = tree.deepEquals(expected);
                 if (!success) {
@@ -235,21 +208,15 @@ public class FlextreeTest extends TestCase {
                     after.print(tree.toJson());
                     after.close();                
                 }
-                assertTrue("Difference found in results for " + expected_name + 
+                assertTrue("Difference found in results for " + 
+                    testCase.getExpectedName() + 
                     ", results written to after.json",
                     success);
         	}
-
         }
-        catch(Exception e) {
-            fail(e.getMessage());
+        catch(IOException e) {
+            fail(e.getMessage());        	
         }
-        assertTrue( true );        
-    }
-
-    private File getFile(String name) {
-    	//System.out.println("name = " + name);
-        return new File(classLoader.getResource(name).getFile());
     }
 
 }
