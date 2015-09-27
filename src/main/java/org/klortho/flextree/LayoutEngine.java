@@ -422,11 +422,11 @@ public class LayoutEngine {
 	}         
 
 	/**
-	 * Normalize the x-coordinate, so that the minimum x is 0.
+	 * Normalize the x-coordinate, so that the root node is at x == 0.
 	 */
 	void normalizeX(WrappedTree wt) {
-		double minX = getMinX(wt);
-        moveRight(wt, -minX);
+		double rootX = wt.x();
+        moveRight(wt, -rootX);
 	}
 
 	double getMinX(WrappedTree wt) {

@@ -31,6 +31,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * method.
  */
 
+// FIXME: take out the methods that allow the user to set hgap, vgap, and zoom.
+
 public class TreeSWT 
   extends Composite 
   implements SelectionListener, PaintListener, ControlListener , Listener, KeyListener
@@ -47,6 +49,7 @@ public class TreeSWT
 	double hgap;
 	double vgap;
 	double zoom;
+	double delta_x;
 
 	KeyHandler z_handler; 
 	
@@ -78,7 +81,8 @@ public class TreeSWT
 	}
 
 	// This class wraps each node of the tree, storing the color that will be
-	// used to render the rectangle
+	// used to render the rectangle. This also un-normalizes the x-coordinate,
+	// such that the minimum one used by SWT is 0.
 	class WrappedTree {
 		Tree tree;
 		RGB rgb;
@@ -95,20 +99,21 @@ public class TreeSWT
                 children[i] = new WrappedTree(tree.children.get(i));
 	        }
 		}
-		public double x() { return tree.x; }
+		public double x() { return tree.x + delta_x; }
 		public double y() { return tree.y; }
 		public double width() { return tree.x_size; }
 		public double height() { return tree.y_size; }
 	}
 	
 	private void autoZoom() {
-		// Compute the averages
+		// Compute the averages, etc.
 		double num_nodes = 0;
 		double sum_x_size = 0;
 		double sum_y_size = 0;
 		double sum_area = 0;
 		double min_x_size = t.x_size;
 		double min_y_size = t.y_size;
+		double min_x = 0;
 		Stack<Tree> toVisit = new Stack<Tree>();
 		toVisit.add(t);
 		while (toVisit.size() > 0) {
@@ -119,6 +124,7 @@ public class TreeSWT
 			sum_area += node.x_size * node.y_size;
 			min_x_size = Math.min(min_x_size, node.x_size);
 			min_y_size = Math.min(min_y_size, node.y_size);
+			min_x = Math.min(min_x, node.x);
 			toVisit.addAll(node.children);
 		}
 		// Adjust zoom so that the average area is 5000 sq pixels
@@ -130,6 +136,7 @@ public class TreeSWT
 		// is less
 		hgap = Math.min(ave_x_size / 10, min_x_size);
 		vgap = Math.min(ave_y_size / 10, min_y_size);
+		delta_x = -min_x;
 	}
 
 	/**
@@ -140,8 +147,8 @@ public class TreeSWT
 		autoZoom();
 		
 		BoundingBox b = t.getBoundingBox();
-		width = b.width;
-		height = b.height;		
+		width = b.x_size();
+		height = b.y_size();		
 		wt = new WrappedTree(t);
 	}
 

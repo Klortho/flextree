@@ -193,8 +193,10 @@ public class FlextreeTest extends TestCase {
                 }
                 else {
                 	// FIXME: need to implement this
+                	System.out.println("Skipped test " + testCase.name + ", because the sizing method is not implemented yet.");
                 	continue;
                 }
+                System.out.println("Running test " + testCase.name);
    		        LayoutEngine engine = b.build();
                 
     			engine.layout(tree);
@@ -202,7 +204,7 @@ public class FlextreeTest extends TestCase {
 
                 Tree expected = testCase.getExpected(); 
 
-                boolean success = tree.deepEquals(expected);
+                boolean success = tree.deepEquals(expected, out.ps);
                 if (!success) {
                     PrintStream after = new PrintStream("after.json");
                     after.print(tree.toJson());
@@ -210,7 +212,7 @@ public class FlextreeTest extends TestCase {
                 }
                 assertTrue("Difference found in results for " + 
                     testCase.getExpectedName() + 
-                    ", results written to after.json",
+                    ", results written to after.json: " + out.toString(),
                     success);
         	}
         }

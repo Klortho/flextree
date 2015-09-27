@@ -15,7 +15,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 @JsonIgnoreProperties({ "boundingBox", "minX", "depth", "parent" })
 public final class Tree {
+	// Note that not every Tree uses x_size and y_size. They are only used
+	// when laying out the tree, and the layout engine is using the
+	// defaultNodeSizeFunction
 	public double x_size, y_size;
+	
 	public Vector<Tree> children;
 	
 	// Set by the layout engine:
@@ -45,9 +49,9 @@ public final class Tree {
         this.y = 0;
     }
 
-    public Tree(double width, double height, Tree ... children) {
-		this.x_size = width;
-		this.y_size = height;
+    public Tree(double x_size, double y_size, Tree ... children) {
+		this.x_size = x_size;
+		this.y_size = y_size;
 		this.children = new Vector<Tree>();
 		this.children.addAll(Arrays.asList(children));
         this.parent = NULL;
@@ -73,18 +77,9 @@ public final class Tree {
 
 
 	public BoundingBox getBoundingBox() {
-		BoundingBox result = new BoundingBox(0, 0);
-		getBoundingBox(this, result);
-		return result;
+		return new BoundingBox(this);
 	}
 	
-	private static void getBoundingBox(Tree tree, BoundingBox b) {
-		b.width = Math.max(b.width, tree.x + tree.x_size);
-		b.height = Math.max(b.height, tree.y + tree.y_size);
-		for (Tree child : tree.children) {
-			getBoundingBox(child, b);
-		}
-	}
 	
 	/**
 	 * Get the total number of nodes in this tree.
@@ -138,8 +133,10 @@ public final class Tree {
 	}
 
 	/**
-	 * Compare two trees in terms of the size and positions of their nodes. Returns
-	 * true if they are equal, false if not.
+	 * Compare two already-layed-out trees in terms of the positions of 
+	 * their nodes. Note that it doesn't compare sizes of the nodes, since not
+	 * every Tree uses x_size and y_size. 
+	 * Returns true if they are equal, false if not.
 	 */
     public boolean deepEquals(Tree other) {
 		// dummy PrintStream -- output will not be used.
@@ -148,15 +145,15 @@ public final class Tree {
     }
 
     public boolean deepEquals(Tree other, PrintStream ps) {
-        if (x_size != other.x_size ||
-            y_size != other.y_size ||
+        if (//x_size != other.x_size ||
+            //y_size != other.y_size ||
             x != other.x ||
             y != other.y ||
             children.size() != other.children.size()) //return false;
         {
         	ps.println("mismatch:\n" +
-            		"x_size: " + x_size + " <=> " + other.x_size + "\n" +
-            		"y_size: " + y_size + " <=> " + other.y_size + "\n" +
+            		//"x_size: " + x_size + " <=> " + other.x_size + "\n" +
+            		//"y_size: " + y_size + " <=> " + other.y_size + "\n" +
             		"x: " + x + " <=> " + other.x + "\n" +
             		"y: " + y + " <=> " + other.y + "\n"
             );

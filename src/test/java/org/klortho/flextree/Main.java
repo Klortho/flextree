@@ -44,7 +44,7 @@ public class Main {
 				treeGenerator = new TreeGenerator() {
 					public Tree makeTree() {
 						try {
-    						return tc.getTreeData();
+    						return tc.getExpected();
 						}
 						catch (IOException e) {
 							return Tree.NULL;
