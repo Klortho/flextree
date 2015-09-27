@@ -1,7 +1,9 @@
 package org.klortho.flextree;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
@@ -136,7 +138,8 @@ public final class Tree {
 	}
 
 	/**
-	 * Compare two trees in terms of the size and positions of their nodes
+	 * Compare two trees in terms of the size and positions of their nodes. Returns
+	 * true if they are equal, false if not.
 	 */
     public boolean deepEquals(Tree other) {
         if (x_size != other.x_size ||
@@ -160,4 +163,45 @@ public final class Tree {
 
         return true;
     }
+
+	/**
+	 * Test to see if the tree has any overlaps among its nodes. Returns true if there
+	 * is any overlap.
+	 */
+	public boolean hasOverlappingNodes() {
+		// dummy PrintStream -- output will not be used.
+		PrintStream ps = new PrintStream(new ByteArrayOutputStream());
+		return hasOverlappingNodes(ps);
+	}
+	
+	/**
+	 * Same as hasOverlappingNodes(), but if an overlapping node is encountered, a message
+	 * about it is written to the PrintStream.
+	 */
+	public boolean hasOverlappingNodes(PrintStream ps) {
+		ArrayList<Tree> nodes = this.allNodes();
+		for (int i = 0 ; i < nodes.size(); i++) {
+			for (int j = 0 ; j < i ; j++) {
+				if (nodeOverlaps(nodes.get(i), nodes.get(j))) {
+					ps.printf("Overlap %d %d!!\n", i, j);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean overlap(double xStart, double xEnd, 
+                                   double xStart2, double xEnd2) 
+	{
+        return (xStart2 < xEnd && xEnd2 > xStart) ||
+               (xStart < xEnd2 && xEnd > xStart2);
+	}
+	
+	private static boolean nodeOverlaps(Tree a, Tree b) {
+        return overlap(a.x, a.x + a.x_size, b.x , b.x + b.x_size) &&
+               overlap(a.y, a.y + a.y_size, b.y, b.y + b.y_size);
+	}
+
+
 }

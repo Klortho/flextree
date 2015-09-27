@@ -1,8 +1,13 @@
 package org.klortho.flextree;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -32,34 +37,6 @@ public class FlextreeTest extends TestCase {
         return new TestSuite( FlextreeTest.class );
     }
     
-	/**
-	 * Test to see if a tree has any overlaps among its nodes.
-	 */
-	public static boolean overlap(Tree tree) {
-		ArrayList<Tree> nodes = tree.allNodes();
-		for (int i = 0 ; i < nodes.size(); i++) {
-			for (int j = 0 ; j < i ; j++) {
-				if (nodeOverlaps(nodes.get(i), nodes.get(j))){
-					System.out.printf("Overlap %d %d!!\n",i,j);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private static boolean overlap(double xStart, double xEnd, 
-			                       double xStart2, double xEnd2) 
-	{
-		return (xStart2 < xEnd && xEnd2 > xStart) ||
-               (xStart < xEnd2 && xEnd > xStart2);
-	}
-
-	public static boolean nodeOverlaps(Tree a, Tree b) {
-		return overlap(a.x, a.x + a.x_size, b.x , b.x + b.x_size) &&
-			   overlap(a.y, a.y + a.y_size, b.y, b.y + b.y_size);
-	}
-	
 
 	public static Tree sampleTree() {
 		return new Tree(76.000000, 31.500000,
@@ -139,12 +116,42 @@ public class FlextreeTest extends TestCase {
 		);
 	}
 
+	
+	// Convenience method that's shared by a couple of tests. This creates a
+	// layout engine that uses nodeSizeFromTree, that gets the node sizes from
+	// the x_size and y_size attributes of each tree node.
 	public void layoutAndCheckTree(Tree t) {
 		LayoutEngine engine = LayoutEngine.builder()
 			                      .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
 			                      .build();
     	engine.layout(t);
-    	assertFalse(overlap(t));
+    	checkOverlap(t);
+	}
+
+	// This is used for logging messages related to one particular (sub)test.
+	public static class StringPrintStream {
+		public PrintStream ps;
+		public ByteArrayOutputStream os;
+		public StringPrintStream() {
+			os = new ByteArrayOutputStream();
+			ps = new PrintStream(os);
+		}
+		public String toString() {
+			return os.toString();
+		}
+	}
+
+	public static void checkOverlap(Tree t) {
+		checkOverlap(t, new StringPrintStream());
+	}
+	
+	public static void checkOverlap(Tree t, StringPrintStream out) {
+		boolean has = t.hasOverlappingNodes(out.ps);
+		if (has) {
+			String msg = out.toString();
+			System.out.println(msg);
+            fail(msg);
+		}
 	}
 
 	/**
@@ -153,7 +160,6 @@ public class FlextreeTest extends TestCase {
 	public void testSampleTree() {
 		Tree t = sampleTree();
 		layoutAndCheckTree(t);
-		// FIXME: rigorously test *all* nodes' results.
 	}
 
     /** 
@@ -166,32 +172,57 @@ public class FlextreeTest extends TestCase {
     	layoutAndCheckTree(t);
     }
     
+    /*
+     * The bulk of our tests will be read from the tests.json file. This class holds
+     * the data from one of the objects in the list from that file.
+     */
+    public static class TestCase {
+    	public String name;
+    	public String description;
+    	public String tree;
+    	public String sizing;
+    	public String gap;
+    	public TestCase() {}
+
+        public static ObjectMapper json_mapper;
+        static {
+            json_mapper = new ObjectMapper();
+            json_mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        }
+    }
+
     /**
-     * Test the layout algorithm against five pseudo-random trees, read from JSON
+     * Test the layout algorithm against the collection of
+     * tests in test/resources/tests.json
      */
     public void testApp()
     {
         try {
-            for (int test_num = 1; test_num <= 9; ++test_num) {
-                Tree tree = Tree.fromJson(getFile("before-" + test_num + ".json"));
-                tree.print();
-                
-                LayoutEngine engine;
-                if (test_num >= 1 && test_num <= 8) {
-            		engine = LayoutEngine.builder()
-		                .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
-		                .build();
-                }
-                else {
-                    // Test 9 uses fixed node size
-            		engine = LayoutEngine.builder()
-                        .setNodeSizeFixed(new double[] {50, 50})
-                        .build();
-                }
-    			engine.layout(tree);
-    			assertFalse(overlap(tree));
+        	List<TestCase> test_cases = TestCase.json_mapper.readValue(
+        			getFile("tests.json"),
+        			new TypeReference<List<TestCase>>() { } );
+        	//System.out.println("num test_cases = " + test_cases.size());
+        	
+        	for (TestCase test_case : test_cases) {
+        		StringPrintStream out = new StringPrintStream();
+        		out.ps.print("Test " + test_case.name + ": ");
+        		
+                Tree tree = Tree.fromJson(getFile(test_case.tree));
+                //tree.print();
+                LayoutEngine.Builder b = LayoutEngine.builder();
 
-                String expected_name = "after-" + test_num + ".json";
+                if (test_case.sizing.equals("node-size-function")) {
+    		        b.setNodeSizeFunction(LayoutEngine.nodeSizeFromTree);
+                }
+                else if (test_case.sizing.equals("node-size-fixed")) {
+                    b.setNodeSizeFixed(new double[] {50, 50});
+                }
+   		        LayoutEngine engine = b.build();
+                
+    			engine.layout(tree);
+    			checkOverlap(tree, out);
+
+                String expected_name = test_case.name + ".expected.json";
                 Tree expected = Tree.fromJson(getFile(expected_name));
 
                 boolean success = tree.deepEquals(expected);
@@ -203,17 +234,17 @@ public class FlextreeTest extends TestCase {
                 assertTrue("Difference found in results for " + expected_name + 
                     ", results written to after.json",
                     success);
-            }
+        	}
+
         }
         catch(Exception e) {
-        	System.out.println(e.getMessage());
             fail(e.getMessage());
         }
         assertTrue( true );        
     }
 
     private File getFile(String name) {
-    	System.out.println("name = " + name);
+    	//System.out.println("name = " + name);
         return new File(classLoader.getResource(name).getFile());
     }
 
