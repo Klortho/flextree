@@ -11,7 +11,8 @@ import org.klortho.flextree.TreeTestCases.TreeTestCase;
  * This renders a tree in SWT, so you can check it out.
  * Usage:
  * - With no arguments, it generates a random tree
- * - With a single string argument, it renders the tree in that JSON file
+ * - <file> - lays out and then renders the tree in that JSON file
+ * - --nolayout <file> - skips laying it out, and renders it
  * - --test <test-name> - lays out that test tree, and renders it
  * - --expected <test-name> - renders the expected tree (without laying it out)
  */
@@ -33,6 +34,10 @@ public class Render {
 			}
 			else if (argv.length == 1) {
 				treeGenerator = new FileTreeGenerator(argv[0]);
+			}
+			else if (argv[0].equals("--nolayout")) {
+				treeGenerator = new FileTreeGenerator(argv[1]);
+				doLayout = false;
 			}
 			else if (argv[0].equals("--test")) {
 				String test_name = argv[1];
@@ -74,6 +79,7 @@ public class Render {
 
 			t = treeGenerator.makeTree();
 			if (doLayout) {
+				System.out.println("Doing layout");
 				engine = LayoutEngine.builder()
 						 .setSetNodeSizes(true)
 					     .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)

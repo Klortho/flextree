@@ -10,11 +10,11 @@ public class Renormalize {
 	public static void main(String[] args) {
 		try {
     	    TreeTestCases testCases = new TreeTestCases();
-    	    for (int i = 0; i < 11; ++i) {
+    	    for (int i = 0; i < 8; ++i) {
     	    	TreeTestCase tc = testCases.cases.get(i);
     	    	Tree expected = tc.getExpected();
-    	    	//double rootX = expected.x;
-    	    	//moveX(expected, -rootX);
+    	    	double root_adj = -expected.x_size / 2;
+    	    	adjX(expected, root_adj);
                 PrintStream after = new PrintStream(tc.name + ".expected.json");
                 after.print(expected.toJson());
                 after.close();                
@@ -25,10 +25,10 @@ public class Renormalize {
 		}
 	}
 	
-	public static void moveX(Tree t, double dx) {
-		t.x = t.x + dx;
+	public static void adjX(Tree t, double root_adj) {
+		t.x = t.x + t.x_size/2 + root_adj;
 		for (Tree k : t.children) {
-			moveX(k, dx);
+			adjX(k, root_adj);
 		}
 	}
 

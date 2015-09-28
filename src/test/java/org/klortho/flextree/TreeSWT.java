@@ -136,7 +136,8 @@ public class TreeSWT
 		zoom = Math.sqrt(5000 / ave_area);
 		// The hgap should be 10% of the average x-size, or the min x-size, whichever
 		// is less
-		hgap = Math.min(ave_x_size / 10, min_x_size);
+		//hgap = Math.min(ave_x_size / 10, min_x_size);
+		hgap = 0;
 		vgap = Math.min(ave_y_size / 10, min_y_size);
 		delta_x = -min_x;
 	}
