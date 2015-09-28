@@ -35,6 +35,104 @@ public class UnitTests extends TestCase {
         return new TestSuite( UnitTests.class );
     }
     
+    // Convenience method that's shared by a couple of tests. This creates a
+    // layout engine that uses nodeSizeFromTree, that gets the node sizes from
+    // the x_size and y_size attributes of each tree node.
+    public void layoutAndCheckTree(Tree t) {
+        LayoutEngine engine = LayoutEngine.builder()
+                                  .setSetNodeSizes(true)
+                                  .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
+                                  .build();
+        engine.layout(t);
+        checkOverlap(t);
+    }
+
+    // This is used for logging messages related to one particular (sub)test.
+    public static class StringPrintStream {
+        public PrintStream ps;
+        public ByteArrayOutputStream os;
+        public StringPrintStream() {
+            os = new ByteArrayOutputStream();
+            ps = new PrintStream(os);
+        }
+        public String toString() {
+            return os.toString();
+        }
+    }
+
+    public static void checkOverlap(Tree t) {
+        checkOverlap(t, new StringPrintStream());
+    }
+    
+    public static void checkOverlap(Tree t, StringPrintStream out) {
+        boolean has = TestUtils.hasOverlappingNodes(t, out.ps);
+        if (has) {
+            String msg = out.toString();
+            System.out.println(msg);
+            fail(msg);
+        }
+    }
+
+    /**
+     * Test the sample tree
+     */
+    public void testSampleTree() {
+        Tree t = sampleTree();
+        layoutAndCheckTree(t);
+    }
+
+    /** 
+     * Generate a pseudo random tree, lay it out, and make sure there are no overlaps.
+     */
+    public void testRandomTree()
+    {
+        int SEED = 43;
+        Tree t = RandomTreeGenerator.makeTree(50, 10, 100, 10, 100, SEED);
+        layoutAndCheckTree(t);
+    }
+    
+    /**
+     * Test the layout algorithm against the collection of
+     * tests in test/resources/tests.json
+     */
+    public void testApp()
+    {
+        try {
+            TreeTestCases testCases = new TreeTestCases();
+            
+            
+            for (TreeTestCase testCase : testCases.cases) {
+              //if (!testCase.name.equals("test11")) continue;
+              
+                StringPrintStream out = new StringPrintStream();
+                out.ps.print("Test " + testCase.name + ": ");
+
+                Tree tree = testCase.getTreeData();
+                //tree.print();
+                LayoutEngine engine = testCase.getLayoutEngine();
+                if (engine == null) continue;
+                
+                System.out.println("Running test " + testCase.name);
+                engine.layout(tree);
+                checkOverlap(tree, out);
+
+                Tree expected = testCase.getExpected(); 
+                boolean success = tree.deepEquals(expected, out.ps);
+                if (!success) {
+                    PrintStream after = new PrintStream("after.json");
+                    after.print(tree.toJson());
+                    after.close();                
+                }
+                assertTrue("Difference found in results for " + 
+                    testCase.getExpectedName() + 
+                    ", results written to after.json: " + out.toString(),
+                    success);
+            }
+        }
+        catch(IOException e) {
+            fail(e.getMessage());           
+        }
+    }
 
     public static Tree sampleTree() {
         return new Tree(76.000000, 31.500000,
@@ -113,118 +211,4 @@ public class UnitTests extends TestCase {
           )
         );
     }
-
-    
-    // Convenience method that's shared by a couple of tests. This creates a
-    // layout engine that uses nodeSizeFromTree, that gets the node sizes from
-    // the x_size and y_size attributes of each tree node.
-    public void layoutAndCheckTree(Tree t) {
-        LayoutEngine engine = LayoutEngine.builder()
-                                  .setSetNodeSizes(true)
-                                  .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
-                                  .build();
-        engine.layout(t);
-        checkOverlap(t);
-    }
-
-    // This is used for logging messages related to one particular (sub)test.
-    public static class StringPrintStream {
-        public PrintStream ps;
-        public ByteArrayOutputStream os;
-        public StringPrintStream() {
-            os = new ByteArrayOutputStream();
-            ps = new PrintStream(os);
-        }
-        public String toString() {
-            return os.toString();
-        }
-    }
-
-    public static void checkOverlap(Tree t) {
-        checkOverlap(t, new StringPrintStream());
-    }
-    
-    public static void checkOverlap(Tree t, StringPrintStream out) {
-        boolean has = TestUtils.hasOverlappingNodes(t, out.ps);
-        if (has) {
-            String msg = out.toString();
-            System.out.println(msg);
-            fail(msg);
-        }
-    }
-
-    /**
-     * Test the sample tree
-     */
-    public void testSampleTree() {
-        Tree t = sampleTree();
-        layoutAndCheckTree(t);
-    }
-
-    /** 
-     * Generate a pseudo random tree, lay it out, and make sure there are no overlaps.
-     */
-    public void testRandomTree()
-    {
-        int SEED = 43;
-        Tree t = RandomTreeGenerator.makeTree(50, 10, 100, 10, 100, SEED);
-        layoutAndCheckTree(t);
-    }
-    
-    /**
-     * Test the layout algorithm against the collection of
-     * tests in test/resources/tests.json
-     */
-
-    public void testApp()
-    {
-        try {
-            TreeTestCases testCases = new TreeTestCases();
-            
-            
-            for (TreeTestCase testCase : testCases.cases) {
-                StringPrintStream out = new StringPrintStream();
-                out.ps.print("Test " + testCase.name + ": ");
-
-                Tree tree = testCase.getTreeData();
-                //tree.print();
-                LayoutEngine.Builder b = LayoutEngine.builder()
-                                             .setSetNodeSizes(true);
-                
-                if (testCase.sizing.equals("node-size-function")) {
-                    b.setNodeSizeFunction(LayoutEngine.nodeSizeFromTree);
-                }
-                else if (testCase.sizing.equals("node-size-fixed")) {
-                    b.setNodeSizeFixed(new double[] {50, 50});
-                }
-                else {
-                    // FIXME: need to implement this
-                    System.out.println("Skipped test " + testCase.name + ", because the sizing method is not implemented yet.");
-                    continue;
-                }
-                System.out.println("Running test " + testCase.name);
-                LayoutEngine engine = b.build();
-                
-                engine.layout(tree);
-                checkOverlap(tree, out);
-
-                Tree expected = testCase.getExpected(); 
-
-                boolean success = tree.deepEquals(expected, out.ps);
-                if (!success) {
-                    PrintStream after = new PrintStream("after.json");
-                    after.print(tree.toJson());
-                    after.close();                
-                }
-                assertTrue("Difference found in results for " + 
-                    testCase.getExpectedName() + 
-                    ", results written to after.json: " + out.toString(),
-                    success);
-            }
-        }
-        catch(IOException e) {
-            fail(e.getMessage());           
-        }
-    }
-
 }

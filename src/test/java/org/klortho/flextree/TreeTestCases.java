@@ -32,7 +32,7 @@ public class TreeTestCases {
      * This inner class holds
      * the data from one of the objects in the list from that file.
      */
-    @JsonIgnoreProperties({ "treeData", "expectedName", "expected" })
+    @JsonIgnoreProperties({ "treeData", "expectedName", "expected", "layoutEngine" })
     public static class TreeTestCase {
         public String name;
         public String description;
@@ -51,6 +51,24 @@ public class TreeTestCases {
         public Tree getExpected() throws IOException {
             return Tree.fromJson(
                 getFile(testCaseDir + "/" + getExpectedName()));
+        }
+        
+        public LayoutEngine getLayoutEngine() {
+            LayoutEngine.Builder b = LayoutEngine.builder()
+                    .setSetNodeSizes(true);
+
+            if (sizing.equals("node-size-function")) {
+                b.setNodeSizeFunction(LayoutEngine.nodeSizeFromTree);
+            }
+            else if (sizing.equals("node-size-fixed")) {
+                b.setNodeSizeFixed(new double[] {50, 50});
+            }
+            else if (sizing.equals("size")) {
+                System.out.println("Skipped test " + name + 
+                    ", because sizing='size' is not implemented yet.");
+                return null;
+            }
+            return b.build();
         }
     }
 

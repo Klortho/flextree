@@ -21,6 +21,7 @@ public class Render {
     static LayoutEngine engine;
     static TreeGenerator treeGenerator;
     static TreeTestCases testCases;
+    static TreeTestCase testCase = null;
     static boolean doLayout = true;
     
     public static void main(String argv[]) {
@@ -41,15 +42,15 @@ public class Render {
             }
             else if (argv[0].equals("--test")) {
                 String test_name = argv[1];
-                TreeTestCase tc = testCases.getTestCase(test_name);
-                if (tc == null) {
+                testCase = testCases.getTestCase(test_name);
+                if (testCase == null) {
                     System.err.println("No test found with that name");
                     System.exit(1);
                 }               
                 treeGenerator = new TreeGenerator() {
                     public Tree makeTree() {
                         try {
-                            return tc.getTreeData();
+                            return testCase.getTreeData();
                         }
                         catch (IOException e) {
                             return null;
@@ -59,15 +60,15 @@ public class Render {
             }
             else if (argv[0].equals("--expected")) {
                 String test_name = argv[1];
-                TreeTestCase tc = testCases.getTestCase(test_name);
-                if (tc == null) {
+                testCase = testCases.getTestCase(test_name);
+                if (testCase == null) {
                     System.err.println("No test found with that name");
                     System.exit(1);
                 }
                 treeGenerator = new TreeGenerator() {
                     public Tree makeTree() {
                         try {
-                            return tc.getExpected();
+                            return testCase.getExpected();
                         }
                         catch (IOException e) {
                             return null;
@@ -80,10 +81,17 @@ public class Render {
             t = treeGenerator.makeTree();
             if (doLayout) {
                 System.out.println("Doing layout");
-                engine = LayoutEngine.builder()
-                         .setSetNodeSizes(true)
-                         .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
-                         .build();
+                LayoutEngine engine;
+                
+                if (testCase == null) {
+                    engine = LayoutEngine.builder()
+                            .setSetNodeSizes(true)
+                            .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
+                            .build();
+                }
+                else {
+                    engine = testCase.getLayoutEngine();
+                }
                 engine.layout(t);
             }
             

@@ -1,5 +1,8 @@
 package org.klortho.flextree;
 
+import java.util.Arrays;
+import java.util.Stack;
+
 /**
  * The extended Reingold-Tilford algorithm as described in the paper
  * "Drawing Non-layered Tidy Trees in Linear Time" by Atze van der Ploeg
@@ -46,15 +49,13 @@ public class LayoutEngine {
     double[] size = defaultSize;
 
     // NodeSizeFixed
-    public static final double[] defaultNodeSizeFixed = null;
-    double[] nodeSizeFixed = defaultNodeSizeFixed;
+    double[] nodeSizeFixed = null;
 
     // NodeSizeFunction - returns an array [x_size, y_size]
     public interface NodeSizeFunction {
         abstract double[] ns(Tree t);
     }
-    public static final NodeSizeFunction defaultNodeSizeFunction = null;
-    NodeSizeFunction nodeSizeFunction = defaultNodeSizeFunction;
+    NodeSizeFunction nodeSizeFunction = null;
     
     // This node size function is defined for convenience -- it gets the node size from
     // x_size and y_size attributes on the Tree node itself.
@@ -111,8 +112,8 @@ public class LayoutEngine {
         private TreeRelation separation = defaultSeparation;
         private TreeRelation spacing = defaultSpacing;
         private double[] size = defaultSize;
-        private double[] nodeSizeFixed = defaultNodeSizeFixed;
-        private NodeSizeFunction nodeSizeFunction = defaultNodeSizeFunction;
+        private double[] nodeSizeFixed = null;
+        private NodeSizeFunction nodeSizeFunction = null;
         private boolean setNodeSizes = false;
     }
     
@@ -154,7 +155,47 @@ public class LayoutEngine {
         zerothWalk(wt, 0);
         firstWalk(wt); 
         secondWalk(wt, 0);
-        normalizeX(wt);
+
+        // If a fixed tree size is specified, scale x and y based on the extent.
+        // Compute the left-most, right-most, and depth-most nodes for extents.
+        if (size != null) {
+            WrappedTree left = wt,
+                        right = wt,
+                        bottom = wt;
+            Stack<WrappedTree> toVisit = new Stack<WrappedTree>();
+            toVisit.push(wt);
+            while (toVisit.size() > 0) {
+                WrappedTree node = toVisit.pop();
+                if (node.x() < left.x()) left = node;
+                if (node.x() > right.x()) right = node;
+                if (node.depth() > bottom.depth()) bottom = node;
+                toVisit.addAll(Arrays.asList(node.children));
+            }
+
+            // Need to implement this separation function:
+            //    var tx = separation(left, right) / 2 - left.x;
+            double tx = 0.5 - left.x();
+
+            // var kx = size[0] / (right.x + separation(right, left) / 2 + tx),
+            double kx = size[0] / (right.x() + 0.5 + tx);
+
+            double ky = size[1] / (bottom.depth() > 0 ? bottom.depth() : 1);
+            
+            toVisit.push(wt);
+            while (toVisit.size() > 0) {
+                WrappedTree node = toVisit.pop();
+                node.x((node.x() + tx) * kx);
+                node.y(node.depth() * ky);
+                if (setNodeSizes) {
+                    node.t.x_size *= kx;
+                    node.t.y_size *= ky;
+                }
+                toVisit.addAll(Arrays.asList(node.children));
+            }
+        }
+        else {
+            normalizeX(wt);
+        }
     }
 
 
