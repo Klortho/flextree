@@ -64,9 +64,7 @@ public class TreeTestCases {
                 b.setNodeSizeFixed(new double[] {50, 50});
             }
             else if (sizing.equals("size")) {
-                System.out.println("Skipped test " + name + 
-                    ", because sizing='size' is not implemented yet.");
-                return null;
+                b.setSize(new double[] {20, 45});
             }
             return b.build();
         }

@@ -22,10 +22,11 @@ public class TestUtils {
      * about it is written to the PrintStream.
      */
     public static boolean hasOverlappingNodes(Tree t, PrintStream ps) {
+        BoundingBox bb = new BoundingBox(t);
         ArrayList<Tree> nodes = t.allNodes();
         for (int i = 0 ; i < nodes.size(); i++) {
             for (int j = 0 ; j < i ; j++) {
-                if (nodeOverlaps(nodes.get(i), nodes.get(j))) {
+                if (nodeOverlaps(bb, nodes.get(i), nodes.get(j))) {
                     ps.printf("Nodes %d and %d overlap!\n", i, j);
                     return true;
                 }
@@ -34,17 +35,21 @@ public class TestUtils {
         return false;
     }
 
-    private static boolean nodeOverlaps(Tree a, Tree b) {
-        return overlap(a.x - a.x_size/2, a.x + a.x_size/2, 
+    private static boolean nodeOverlaps(BoundingBox bb, Tree a, Tree b) {
+        return overlap(bb.x_size(), a.x - a.x_size/2, a.x + a.x_size/2, 
                        b.x - b.x_size/2, b.x + b.x_size/2) &&
-               overlap(a.y, a.y + a.y_size, b.y, b.y + b.y_size);
+               overlap(bb.y_size(), a.y, a.y + a.y_size, b.y, b.y + b.y_size);
     }
 
-    private static boolean overlap(double start0, double end0, 
-            double start1, double end1) 
+    private static boolean overlap(double scale, double start0, double end0, 
+                                   double start1, double end1) 
     {
-        return (start1 < end0 && end1 > start0) ||
-        (start0 < end1 && end0 > start1);
+        return (lt(scale, start1, end0) && lt(scale, start0, end1)) ||
+               (lt(scale, start0, end1) && lt(scale, start1, end0));
+    }
+    
+    private static boolean lt(double scale, double a, double b) {
+        return (a < b && (b - a > scale * 0.00000000001));
     }
 
 
