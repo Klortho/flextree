@@ -378,9 +378,11 @@ public class LayoutEngine {
 	void positionRoot(WrappedTree wt) {
 	    // Position root between children, taking into account their mod.  
 	    wt.prelim = ( wt.children[0].prelim + 
-	 		          wt.children[0].mod + 
+	 		          wt.children[0].mod -
+	 		          wt.children[0].x_size()/2 +
  			          wt.children[wt.num_children - 1].mod + 
-                      wt.children[wt.num_children - 1].prelim ) / 2;
+                      wt.children[wt.num_children - 1].prelim +
+                      wt.children[wt.num_children - 1].x_size()/2) / 2;
 	}
 
 	void secondWalk(WrappedTree t, double modsum) {
