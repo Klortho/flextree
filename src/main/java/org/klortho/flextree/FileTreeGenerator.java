@@ -7,22 +7,22 @@ import java.io.IOException;
  * Reads a tree from a JSON file
  */
 public class FileTreeGenerator implements TreeGenerator {
-	String filename;
-	
-	public FileTreeGenerator(String filename) {
-		this.filename = filename;
-	}
-	
-	public Tree makeTree() {
-		Tree t = null;
-		try {
-			t = Tree.fromJson(new File(filename));
-			System.out.println("Got tree");
-			System.out.println(t.toJson());
-		}
-		catch(IOException e) {
-			System.err.println("IOException: " + e.getMessage());
-		}
-		return t;
-	}
+    String filename;
+    
+    public FileTreeGenerator(String filename) {
+        this.filename = filename;
+    }
+    
+    public Tree makeTree() {
+        Tree t = null;
+        try {
+            t = Tree.fromJson(new File(filename));
+            System.out.println("Got tree");
+            System.out.println(t.toJson());
+        }
+        catch(IOException e) {
+            System.err.println("IOException: " + e.getMessage());
+        }
+        return t;
+    }
 }

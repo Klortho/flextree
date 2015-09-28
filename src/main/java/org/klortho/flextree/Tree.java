@@ -17,20 +17,20 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @JsonIgnoreProperties({ "boundingBox", "minX", "depth", "parent" })
 @JsonPropertyOrder({ "x", "y", "x_size", "y_size", "children" })
 public final class Tree {
-	
-	public Vector<Tree> children;
-	
-	// Set by the layout engine:
-	public Tree parent;
-	public int depth;
-	public double x, y;
+    
+    public Vector<Tree> children;
+    
+    // Set by the layout engine:
+    public Tree parent;
+    public int depth;
+    public double x, y;
 
-	// Note that not every Tree uses x_size and y_size. They are only used
-	// when laying out the tree, and the layout engine is using the
-	// defaultNodeSizeFunction.  If you set setNodeSizes to true on the layout 
-	// engine, then it will set these values to those that it used during the 
-	// layout.
-	public double x_size, y_size;
+    // Note that not every Tree uses x_size and y_size. They are only used
+    // when laying out the tree, and the layout engine is using the
+    // defaultNodeSizeFunction.  If you set setNodeSizes to true on the layout 
+    // engine, then it will set these values to those that it used during the 
+    // layout.
+    public double x_size, y_size;
 
     public static ObjectMapper json_mapper;
     static {
@@ -56,12 +56,12 @@ public final class Tree {
      * the hierarchical test tree.
      */
     public Tree(double x_size, double y_size, Tree ... children) {
-		this.x_size = x_size;
-		this.y_size = y_size;
-		this.children = new Vector<Tree>();
-		this.children.addAll(Arrays.asList(children));
+        this.x_size = x_size;
+        this.y_size = y_size;
+        this.children = new Vector<Tree>();
+        this.children.addAll(Arrays.asList(children));
         this.parent = null;
-	}
+    }
 
     /**
      *  Create a tree from a JSON file
@@ -82,71 +82,71 @@ public final class Tree {
     }
 
 
-	/**
-	 * Get the total number of nodes in this tree.
-	 */
-	public int size() {
-		int n = 1;
-		for (Tree node : children) {
-			n += node.size();
-		}
-		return n;
-	}
-	
-	public boolean hasChildren() {
-		return children.size() > 0;
-	}
-	
-	/**
-	 * Get a list of all of the nodes in the tree, in depth-first order.
-	 */
-	public ArrayList<Tree> allNodes() {
-		ArrayList<Tree> nodes = new ArrayList<Tree>();
-		nodes.add(this);
-		for (Tree kid : children) {
-			nodes.addAll(kid.allNodes());
-		}
-		return nodes;
-	}
-	
-	public int getDepth() {
-		int d = 1;
-		for (Tree child : children) {
-			d = Math.max(d, child.getDepth() + 1);
-		}
-		return d;
-	}
-	
-	/**
-	 * Print out the Tree in Java format (result can be pasted into Java code
-	 * as a constructor).
-	 */
-	public void print() {
-		print(0);
-	}
+    /**
+     * Get the total number of nodes in this tree.
+     */
+    public int size() {
+        int n = 1;
+        for (Tree node : children) {
+            n += node.size();
+        }
+        return n;
+    }
+    
+    public boolean hasChildren() {
+        return children.size() > 0;
+    }
+    
+    /**
+     * Get a list of all of the nodes in the tree, in depth-first order.
+     */
+    public ArrayList<Tree> allNodes() {
+        ArrayList<Tree> nodes = new ArrayList<Tree>();
+        nodes.add(this);
+        for (Tree kid : children) {
+            nodes.addAll(kid.allNodes());
+        }
+        return nodes;
+    }
+    
+    public int getDepth() {
+        int d = 1;
+        for (Tree child : children) {
+            d = Math.max(d, child.getDepth() + 1);
+        }
+        return d;
+    }
+    
+    /**
+     * Print out the Tree in Java format (result can be pasted into Java code
+     * as a constructor).
+     */
+    public void print() {
+        print(0);
+    }
 
-	private void print(int indent) {
-		String istr = "";
-		for (int i = 0; i < indent; ++i) istr += "  ";
-		System.out.printf(istr + "new Tree(%f, %f", x_size, y_size);
-		for (Tree child : children) {
-			System.out.printf(",\n");
-			child.print(indent + 1);
-		}
-		if (children.size() > 0) System.out.print("\n" + istr);
-		System.out.print(")");
-	}
+    private void print(int indent) {
+        String istr = "";
+        for (int i = 0; i < indent; ++i) istr += "  ";
+        System.out.printf(istr + "new Tree(%f, %f", x_size, y_size);
+        for (Tree child : children) {
+            System.out.printf(",\n");
+            child.print(indent + 1);
+        }
+        if (children.size() > 0) System.out.print("\n" + istr);
+        System.out.print(")");
+    }
 
-	/**
-	 * Compare two already-layed-out trees in terms of the positions of 
-	 * their nodes. Note that it doesn't compare sizes of the nodes, since not
-	 * every Tree uses x_size and y_size. 
-	 * Returns true if they are equal, false if not.
-	 */
+    /**
+     * Compare two already-layed-out trees in terms of the positions of 
+     * their nodes. Note that it doesn't compare sizes of the nodes, since not
+     * every Tree uses x_size and y_size. 
+     * Returns true if they are equal, false if not.
+     */
     public boolean deepEquals(Tree other) {
-		// dummy PrintStream -- output will not be used.
-		PrintStream ps = new PrintStream(new ByteArrayOutputStream());
-		return deepEquals(other, ps);
+        // dummy PrintStream -- output will not be used.
+        PrintStream ps = new PrintStream(new ByteArrayOutputStream());
+        return deepEquals(other, ps);
     }
 
     /**
@@ -158,12 +158,12 @@ public final class Tree {
             y != other.y ||
             children.size() != other.children.size()) //return false;
         {
-        	ps.println("mismatch:\n" +
-            		"x: " + x + " <=> " + other.x + "\n" +
-            		"y: " + y + " <=> " + other.y + "\n" +
-            		"number of children: " + children.size() + " <=> " + other.children.size() + "\n"
+            ps.println("mismatch:\n" +
+                    "x: " + x + " <=> " + other.x + "\n" +
+                    "y: " + y + " <=> " + other.y + "\n" +
+                    "number of children: " + children.size() + " <=> " + other.children.size() + "\n"
             );
-        	return false;
+            return false;
         }
 
         for (int i = 0; i < children.size(); ++i) {

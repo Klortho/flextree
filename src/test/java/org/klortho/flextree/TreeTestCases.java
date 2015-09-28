@@ -16,10 +16,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * file, and provides methods to access the data.
  */
 public class TreeTestCases {
-	
-	public List<TreeTestCase> cases;
-	
-	public static final String testCaseDir = "test-cases";
+    
+    public List<TreeTestCase> cases;
+    
+    public static final String testCaseDir = "test-cases";
     public static ClassLoader classLoader;
     public static ObjectMapper json_mapper;
     static {
@@ -34,42 +34,42 @@ public class TreeTestCases {
      */
     @JsonIgnoreProperties({ "treeData", "expectedName", "expected" })
     public static class TreeTestCase {
-    	public String name;
-    	public String description;
-    	public String tree;
-    	public String sizing;
-    	public String gap;
-    	
-    	public TreeTestCase() {};
-    	
-    	public Tree getTreeData() throws IOException {
-    		return Tree.fromJson(getFile(testCaseDir + "/" + tree));
-    	}
-    	public String getExpectedName() {
-    		return name + ".expected.json";
-    	}
-    	public Tree getExpected() throws IOException {
-    		return Tree.fromJson(
-    			getFile(testCaseDir + "/" + getExpectedName()));
-    	}
+        public String name;
+        public String description;
+        public String tree;
+        public String sizing;
+        public String gap;
+        
+        public TreeTestCase() {};
+        
+        public Tree getTreeData() throws IOException {
+            return Tree.fromJson(getFile(testCaseDir + "/" + tree));
+        }
+        public String getExpectedName() {
+            return name + ".expected.json";
+        }
+        public Tree getExpected() throws IOException {
+            return Tree.fromJson(
+                getFile(testCaseDir + "/" + getExpectedName()));
+        }
     }
 
-   	public TreeTestCases() 
-	  throws JsonParseException, JsonMappingException, IOException 
-	{
+    public TreeTestCases() 
+      throws JsonParseException, JsonMappingException, IOException 
+    {
         classLoader = getClass().getClassLoader();
         cases = json_mapper.readValue(
-    			getFile(testCaseDir + "/tests.json"),
-    			new TypeReference<List<TreeTestCase>>() { } );
+                getFile(testCaseDir + "/tests.json"),
+                new TypeReference<List<TreeTestCase>>() { } );
         //System.out.println(json_mapper.writeValueAsString(cases));
-	}
+    }
 
-   	public TreeTestCase getTestCase(String name) {
-   		for (TreeTestCase tc : cases) {
-   			if (tc.name.equals(name)) return tc;
-   		}
-   		return null;
-   	}
+    public TreeTestCase getTestCase(String name) {
+        for (TreeTestCase tc : cases) {
+            if (tc.name.equals(name)) return tc;
+        }
+        return null;
+    }
     public static File getFile(String name) {
         return new File(classLoader.getResource(name).getFile());
     }
