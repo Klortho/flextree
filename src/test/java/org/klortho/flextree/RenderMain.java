@@ -16,7 +16,7 @@ import org.klortho.flextree.TreeTestCases.TreeTestCase;
  * - --test <test-name> - lays out that test tree, and renders it
  * - --expected <test-name> - renders the expected tree (without laying it out)
  */
-public class Render {
+public class RenderMain {
     static Tree t;
     static LayoutEngine engine;
     static TreeGenerator treeGenerator;
