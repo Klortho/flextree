@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.klortho.flextree.LayoutEngine.TreeRelation;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -35,6 +37,7 @@ public class TreeTestCases {
     @JsonIgnoreProperties({ "treeData", "expectedName", "expected", "layoutEngine" })
     public static class TreeTestCase {
         public String name;
+        public boolean skip;
         public String description;
         public String tree;
         public String sizing;
@@ -64,8 +67,40 @@ public class TreeTestCases {
                 b.setNodeSizeFixed(new double[] {50, 50});
             }
             else if (sizing.equals("size")) {
-                b.setSize(new double[] {20, 45});
+                b.setSize(new double[] {200, 100});
             }
+
+            if (gap.equals("spacing-0")) {
+                b.setSpacing(new TreeRelation() {
+                    public double s(Tree a, Tree b) {
+                        return 0;
+                    }
+                });
+            }
+            else if (gap.equals("spacing-custom")) {
+                // spacing custom relies on the fact that we've set setNodeSizes above,
+                // so that we know the root node will have x_size set on it.
+                b.setSpacing(new TreeRelation() {
+                    Tree root = null;
+                    public double s(Tree a, Tree b) {
+                        if (root == null) {
+                            root = a;
+                            while (root.parent != null) root = root.parent;
+                        }
+                        return a.parent == b.parent ? 0 : root.x_size;
+                    }
+                });
+            }
+                   
+            else if (gap.equals("separation-1")) {
+                b.setSeparation(new TreeRelation() {
+                    public double s(Tree a, Tree b) {
+                        System.out.println("In separation-1");
+                        return 1;
+                    }
+                });
+            }
+
             return b.build();
         }
     }

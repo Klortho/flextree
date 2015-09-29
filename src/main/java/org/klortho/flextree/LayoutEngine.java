@@ -35,14 +35,13 @@ public class LayoutEngine {
     // Separation
     public static final TreeRelation defaultSeparation = new TreeRelation() {
         public double s(Tree a, Tree b) {
-            return a.parent == b.parent ? 0 : 1;
+            return a.parent == b.parent ? 1 : 2;
         }
     };
     TreeRelation separation = defaultSeparation;
     
     // Spacing
-    public static final TreeRelation defaultSpacing = null;
-    TreeRelation spacing = defaultSpacing;
+    TreeRelation spacing = null;
     
     // Size
     public static final double[] defaultSize = new double[] {1.0, 1.0};
@@ -110,7 +109,7 @@ public class LayoutEngine {
         }
         
         private TreeRelation separation = defaultSeparation;
-        private TreeRelation spacing = defaultSpacing;
+        private TreeRelation spacing = null;
         private double[] size = defaultSize;
         private double[] nodeSizeFixed = null;
         private NodeSizeFunction nodeSizeFunction = null;
@@ -340,9 +339,11 @@ public class LayoutEngine {
         while (sr != null && cl != null) {
             if (bottom(sr) > ih.lowY) ih = ih.nxt;
           
-            // How far to the left of the right side of sr is the left side of cl?  
-            //double dist = (mssr + sr.prelim + sr.x_size()) - (mscl + cl.prelim);
+            // How far to the left of the right side of sr is the left side of cl?
             double dist = (mssr + sr.prelim + sr.x_size()/2) - (mscl + cl.prelim - cl.x_size()/2);
+            if (spacing != null) {
+                dist += spacing.s(sr.t, cl.t);
+            }
             if (dist > 0) {
                 mscl += dist;
                 moveSubtree(t, i, ih.index, dist);

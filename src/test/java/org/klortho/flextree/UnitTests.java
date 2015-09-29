@@ -102,7 +102,11 @@ public class UnitTests extends TestCase {
             
             
             for (TreeTestCase testCase : testCases.cases) {
-              //if (!testCase.name.equals("test11")) continue;
+                if (testCase.skip) {
+                    System.out.println("Skipping " + testCase.name + " because skip == true.");
+                    continue;
+                }
+
               
                 StringPrintStream out = new StringPrintStream();
                 out.ps.print("Test " + testCase.name + ": ");

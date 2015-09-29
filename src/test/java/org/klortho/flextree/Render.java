@@ -94,6 +94,9 @@ public class Render {
                 }
                 engine.layout(t);
             }
+            else {
+                System.out.println("Skipping layout");
+            }
             
             System.out.println("Writing layed out tree data to 'after.json'.");
             PrintWriter out = new PrintWriter("after.json");
