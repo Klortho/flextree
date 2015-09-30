@@ -184,10 +184,11 @@ public class LayoutEngine {
 
             // Need to implement this separation function:
             //    var tx = separation(left, right) / 2 - left.x;
-            double tx = 0.5 - left.x();
+            double sep = separation == null ? 0.5 : separation.s(left.t, right.t)/2;
+            double tx = sep - left.x();
 
             // var kx = size[0] / (right.x + separation(right, left) / 2 + tx),
-            double kx = size[0] / (right.x() + 0.5 + tx);
+            double kx = size[0] / (right.x() + sep + tx);
 
             double ky = size[1] / (bottom.depth() > 0 ? bottom.depth() : 1);
             
