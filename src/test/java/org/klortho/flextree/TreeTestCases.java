@@ -95,7 +95,7 @@ public class TreeTestCases {
             else if (gap.equals("separation-1")) {
                 b.setSeparation(new TreeRelation() {
                     public double s(Tree a, Tree b) {
-                        System.out.println("In separation-1");
+                        //System.out.println("In separation-1");
                         return 1;
                     }
                 });

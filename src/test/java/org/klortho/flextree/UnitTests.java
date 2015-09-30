@@ -3,6 +3,8 @@ package org.klortho.flextree;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.klortho.flextree.TreeTestCases.TreeTestCase;
 
@@ -42,6 +44,7 @@ public class UnitTests extends TestCase {
         LayoutEngine engine = LayoutEngine.builder()
                                   .setSetNodeSizes(true)
                                   .setNodeSizeFunction(LayoutEngine.nodeSizeFromTree)
+                                  .setSpacing(LayoutEngine.spacing0)
                                   .build();
         engine.layout(t);
         checkOverlap(t);
@@ -98,15 +101,24 @@ public class UnitTests extends TestCase {
     public void testApp()
     {
         try {
+            String tests_property = System.getProperty("tests");
+            ArrayList<String> selected_tests = 
+                tests_property == null ? null :
+                    new ArrayList<String>(Arrays.asList(tests_property.split(",")));
+
+            
             TreeTestCases testCases = new TreeTestCases();
             
             
             for (TreeTestCase testCase : testCases.cases) {
+                if (selected_tests != null && !selected_tests.contains(testCase.name)) {
+                    //System.out.println("Skipping " + testCase.name + " because you told me to");
+                    continue;
+                }
                 if (testCase.skip) {
                     System.out.println("Skipping " + testCase.name + " because skip == true.");
                     continue;
                 }
-
               
                 StringPrintStream out = new StringPrintStream();
                 out.ps.print("Test " + testCase.name + ": ");

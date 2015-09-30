@@ -28,6 +28,8 @@ public class TestUtils {
             for (int j = 0 ; j < i ; j++) {
                 if (nodeOverlaps(bb, nodes.get(i), nodes.get(j))) {
                     ps.printf("Nodes %d and %d overlap!\n", i, j);
+                    printNode(ps, nodes, i);
+                    printNode(ps, nodes, j);
                     return true;
                 }
             }
@@ -52,6 +54,16 @@ public class TestUtils {
         return (a < b && (b - a > scale * 0.00000000001));
     }
 
-
+    private static void printNode(PrintStream ps, ArrayList<Tree> nodes, int i) {
+        Tree node = nodes.get(i);
+        ps.print(
+            "Node " + i + ":\n" +
+            "  x: " + node.x + "\n" +
+            "  y: " + node.y + "\n" +
+            "  x_size: " + node.x_size + "\n" +
+            "  y_size: " + node.y_size + "\n"
+        );
+        
+    }
 
 }

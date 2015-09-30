@@ -43,6 +43,13 @@ public class LayoutEngine {
     // Spacing
     TreeRelation spacing = null;
     
+    // This spacing function is defined for convenience - always returns 0.
+    public static final TreeRelation spacing0 = new TreeRelation() {
+        public double s(Tree a, Tree b) {
+            return 0;
+        }
+    };
+    
     // Size
     public static final double[] defaultSize = new double[] {1.0, 1.0};
     double[] size = defaultSize;
@@ -67,6 +74,9 @@ public class LayoutEngine {
     // If this is set to true, then the layout engine will set the x_size and y_size
     // attributes on each tree node.
     boolean setNodeSizes = false;
+    
+    // This stores the x_size of the root node, for use with the spacing function
+    double rootXSize;
 
     
 
@@ -151,6 +161,7 @@ public class LayoutEngine {
      */
     public void layout(Tree t) { 
         WrappedTree wt = new WrappedTree(t);
+        rootXSize = wt.x_size;
         zerothWalk(wt, 0);
         firstWalk(wt); 
         secondWalk(wt, 0);
@@ -340,9 +351,16 @@ public class LayoutEngine {
             if (bottom(sr) > ih.lowY) ih = ih.nxt;
           
             // How far to the left of the right side of sr is the left side of cl?
-            double dist = (mssr + sr.prelim + sr.x_size()/2) - (mscl + cl.prelim - cl.x_size()/2);
-            if (spacing != null) {
-                dist += spacing.s(sr.t, cl.t);
+            // First compute the center-to-center distance
+            //double dist = (mssr + sr.prelim + sr.x_size()/2) - (mscl + cl.prelim - cl.x_size()/2);
+            double dist = (mssr + sr.prelim) - (mscl + cl.prelim);
+            if (separation != null) {
+                //System.out.println("separation not null");
+                dist += separation.s(sr.t, cl.t) * rootXSize;
+            }
+            else if (spacing != null) {
+                //System.out.println("spacing not null");
+                dist += sr.x_size()/2 + cl.x_size()/2 + spacing.s(sr.t, cl.t);
             }
             if (dist > 0) {
                 mscl += dist;
