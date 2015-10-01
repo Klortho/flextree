@@ -11,11 +11,6 @@ import java.util.Stack;
  * This code is in the public domain, use it any way you wish. A reference to the paper is 
  * appreciated!
  * 
- * This LayoutEngine sets the x and y coordinates for every node in the tree such that:
- * - x coordinate of a node specifies the center of the node, horizontally. 
- * - y coordinate specifies the top edge
- * - the root's coordinates are [0, 0]
- * 
  * Instantiate one of these with either:
  * - LayoutEngine engine = new LayoutEngine();   // to use all defaults
  * - LayoutEngine engine = LayoutEngine.builder()
@@ -182,14 +177,9 @@ public class LayoutEngine {
                 toVisit.addAll(Arrays.asList(node.children));
             }
 
-            // Need to implement this separation function:
-            //    var tx = separation(left, right) / 2 - left.x;
             double sep = separation == null ? 0.5 : separation.s(left.t, right.t)/2;
             double tx = sep - left.x();
-
-            // var kx = size[0] / (right.x + separation(right, left) / 2 + tx),
             double kx = size[0] / (right.x() + sep + tx);
-
             double ky = size[1] / (bottom.depth() > 0 ? bottom.depth() : 1);
             
             toVisit.push(wt);
@@ -302,70 +292,68 @@ public class LayoutEngine {
         }
     }
 
-    void firstWalk(WrappedTree t) {
-        if (t.num_children == 0) { 
-            setExtremes(t); 
+    void firstWalk(WrappedTree wt) {
+        if (wt.num_children == 0) { 
+            setExtremes(wt); 
             return; 
         }
-        firstWalk(t.children[0]);
+        firstWalk(wt.children[0]);
         
         // Create siblings in contour minimal vertical coordinate and index list.
-        IYL ih =  updateIYL(bottom(t.children[0].el), 0, null);
+        IYL ih =  updateIYL(bottom(wt.children[0].el), 0, null);
         
-        for (int i = 1; i < t.num_children; i++) {
-            firstWalk(t.children[i]);
+        for (int i = 1; i < wt.num_children; i++) {
+            firstWalk(wt.children[i]);
             
             // Store lowest vertical coordinate while extreme nodes still point in 
             // current subtree.
-            double minY = bottom(t.children[i].er);                                
-            seperate(t, i, ih);
+            double minY = bottom(wt.children[i].er);                                
+            separate(wt, i, ih);
             ih = updateIYL(minY, i, ih);                                     
         }
-        positionRoot(t);
-        setExtremes(t);
+        positionRoot(wt);
+        setExtremes(wt);
     }
           
-    void setExtremes(WrappedTree t) {
-        if (t.num_children == 0) {
-            t.el = t; 
-            t.er = t;
-            t.msel = t.mser = 0;
+    void setExtremes(WrappedTree wt) {
+        if (wt.num_children == 0) {
+            wt.el = wt; 
+            wt.er = wt;
+            wt.msel = wt.mser = 0;
         }
         else {
-            t.el = t.children[0].el; 
-            t.msel = t.children[0].msel;
-            t.er = t.children[t.num_children - 1].er; 
-            t.mser = t.children[t.num_children - 1].mser;
+            wt.el = wt.children[0].el; 
+            wt.msel = wt.children[0].msel;
+            wt.er = wt.children[wt.num_children - 1].er; 
+            wt.mser = wt.children[wt.num_children - 1].mser;
         }
     }
       
-    void seperate(WrappedTree t, int i, IYL ih) {
+    void separate(WrappedTree wt, int i, IYL ih) {
         // Right contour node of left siblings and its sum of modifiers.  
-        WrappedTree sr = t.children[i-1]; 
+        WrappedTree sr = wt.children[i-1]; 
         double mssr = sr.mod;
        
         // Left contour node of current subtree and its sum of modifiers.  
-        WrappedTree cl = t.children[i]; 
+        WrappedTree cl = wt.children[i]; 
         double mscl = cl.mod;
        
         while (sr != null && cl != null) {
             if (bottom(sr) > ih.lowY) ih = ih.nxt;
           
             // How far to the left of the right side of sr is the left side of cl?
-            // First compute the center-to-center distance
-            //double dist = (mssr + sr.prelim + sr.x_size()/2) - (mscl + cl.prelim - cl.x_size()/2);
+            // First compute the center-to-center distance, then add the something
+            // depending on separation/spacing
             double dist = (mssr + sr.prelim) - (mscl + cl.prelim);
             if (separation != null) {
-                //System.out.println("separation not null");
                 dist += separation.s(sr.t, cl.t) * rootXSize;
             }
             else if (spacing != null) {
-                //System.out.println("spacing not null");
                 dist += sr.x_size()/2 + cl.x_size()/2 + spacing.s(sr.t, cl.t);
             }
             if (dist > 0) {
                 mscl += dist;
-                moveSubtree(t, i, ih.index, dist);
+                moveSubtree(wt, i, ih.index, dist);
             }
             double sy = bottom(sr), 
                    cy = bottom(cl);
@@ -373,7 +361,7 @@ public class LayoutEngine {
             // Advance highest node(s) and sum(s) of modifiers  
             if (sy <= cy) {                                                    
                 sr = nextRightContour(sr);
-                if (sr!=null) mssr += sr.mod;
+                if (sr != null) mssr += sr.mod;
             }                                                               
             if (sy >= cy) {                                           
                 cl = nextLeftContour(cl);
@@ -383,57 +371,57 @@ public class LayoutEngine {
 
         // Set threads and update extreme nodes.  
         // In the first case, the current subtree must be taller than the left siblings.  
-        if (sr == null && cl != null) setLeftThread(t, i, cl, mscl);
+        if (sr == null && cl != null) setLeftThread(wt, i, cl, mscl);
         
         // In this case, the left siblings must be taller than the current subtree.  
-        else if (sr != null && cl == null) setRightThread(t, i, sr, mssr);
+        else if (sr != null && cl == null) setRightThread(wt, i, sr, mssr);
     }
 
-    void moveSubtree(WrappedTree t, int i, int si, double dist) {
+    void moveSubtree(WrappedTree wt, int i, int si, double dist) {
         // Move subtree by changing mod.  
-        t.children[i].mod += dist; 
-        t.children[i].msel += dist; 
-        t.children[i].mser += dist;
-        distributeExtra(t, i, si, dist);                                  
+        wt.children[i].mod += dist; 
+        wt.children[i].msel += dist; 
+        wt.children[i].mser += dist;
+        distributeExtra(wt, i, si, dist);                                  
     }
       
-    WrappedTree nextLeftContour(WrappedTree t) {
-        return t.num_children == 0 ? t.tl : t.children[0];
+    WrappedTree nextLeftContour(WrappedTree wt) {
+        return wt.num_children == 0 ? wt.tl : wt.children[0];
     }
     
-    WrappedTree nextRightContour(WrappedTree t) {
-        return t.num_children == 0 ? t.tr : t.children[t.num_children - 1];
+    WrappedTree nextRightContour(WrappedTree wt) {
+        return wt.num_children == 0 ? wt.tr : wt.children[wt.num_children - 1];
     }
     
-    double bottom(WrappedTree t) { 
-        return t.y() + t.y_size(); 
+    double bottom(WrappedTree wt) { 
+        return wt.y() + wt.y_size(); 
     }
       
-    void setLeftThread(WrappedTree t, int i, WrappedTree cl, double modsumcl) {
-        WrappedTree li = t.children[0].el;
+    void setLeftThread(WrappedTree wt, int i, WrappedTree cl, double modsumcl) {
+        WrappedTree li = wt.children[0].el;
         li.tl = cl;
        
         // Change mod so that the sum of modifier after following thread is correct.  
-        double diff = (modsumcl - cl.mod) - t.children[0].msel;
+        double diff = (modsumcl - cl.mod) - wt.children[0].msel;
         li.mod += diff; 
        
         // Change preliminary x coordinate so that the node does not move.  
         li.prelim -= diff;
        
         // Update extreme node and its sum of modifiers.  
-        t.children[0].el = t.children[i].el; 
-        t.children[0].msel = t.children[i].msel;
+        wt.children[0].el = wt.children[i].el; 
+        wt.children[0].msel = wt.children[i].msel;
     }
       
     // Symmetrical to setLeftThread.  
-    void setRightThread(WrappedTree t, int i, WrappedTree sr, double modsumsr) {
-        WrappedTree ri = t.children[i].er;
+    void setRightThread(WrappedTree wt, int i, WrappedTree sr, double modsumsr) {
+        WrappedTree ri = wt.children[i].er;
         ri.tr = sr;
-        double diff = (modsumsr - sr.mod) - t.children[i].mser;
+        double diff = (modsumsr - sr.mod) - wt.children[i].mser;
         ri.mod += diff; 
         ri.prelim -= diff;
-        t.children[i].er = t.children[i - 1].er; 
-        t.children[i].mser = t.children[i - 1].mser;
+        wt.children[i].er = wt.children[i - 1].er; 
+        wt.children[i].mser = wt.children[i - 1].mser;
     }
 
     void positionRoot(WrappedTree wt) {
@@ -446,31 +434,32 @@ public class LayoutEngine {
                       wt.children[wt.num_children - 1].x_size()/2) / 2;
     }
 
-    void secondWalk(WrappedTree t, double modsum) {
-        modsum += t.mod;
+    void secondWalk(WrappedTree wt, double modsum) {
+        modsum += wt.mod;
         // Set absolute (non-relative) horizontal coordinate.  
-        t.x(t.prelim + modsum);
-        addChildSpacing(t);                                               
-        for (int i = 0; i < t.num_children; i++) secondWalk(t.children[i], modsum);
+        wt.x(wt.prelim + modsum);
+        addChildSpacing(wt);                                               
+        for (int i = 0; i < wt.num_children; i++) 
+            secondWalk(wt.children[i], modsum);
     }
 
-    void distributeExtra(WrappedTree t, int i, int si, double dist) {           
+    void distributeExtra(WrappedTree wt, int i, int si, double dist) {           
         // Are there intermediate children?
         if (si != i - 1) {                                                    
             double nr = i - si;                                            
-            t.children[si + 1].shift += dist / nr;                                     
-            t.children[i].shift -= dist / nr;                                         
-            t.children[i].change -= dist - dist / nr;                                 
+            wt.children[si + 1].shift += dist / nr;                                     
+            wt.children[i].shift -= dist / nr;                                         
+            wt.children[i].change -= dist - dist / nr;                                 
         }                                                                 
     }                                                                    
      
     // Process change and shift to add intermediate spacing to mod.  
-    void addChildSpacing(WrappedTree t) {
+    void addChildSpacing(WrappedTree wt) {
         double d = 0, modsumdelta = 0;                                    
-        for (int i = 0; i < t.num_children; i++) {                                  
-            d += t.children[i].shift;                                               
-            modsumdelta += d + t.children[i].change;                                
-            t.children[i].mod += modsumdelta;                                       
+        for (int i = 0; i < wt.num_children; i++) {                                  
+            d += wt.children[i].shift;                                               
+            modsumdelta += d + wt.children[i].change;                                
+            wt.children[i].mod += modsumdelta;                                       
         }                                                                 
     }                                                                    
 

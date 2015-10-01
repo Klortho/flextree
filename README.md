@@ -2,6 +2,9 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 
 # Compiling and running
 
+* Clone this repository, and also Klortho/d3-flextree.
+* Create a softlink from this repo's src/test/resources/test-cases to
+  d3-flextree's test-cases directory.
 * Download and install Eclipse.
 * Download the SWT binaries from [here](https://www.eclipse.org/swt/), 
   for whatever platform you are on.
