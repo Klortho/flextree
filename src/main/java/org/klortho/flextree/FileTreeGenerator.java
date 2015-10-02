@@ -17,8 +17,6 @@ public class FileTreeGenerator implements TreeGenerator {
         Tree t = null;
         try {
             t = Tree.fromJson(new File(filename));
-            System.out.println("Got tree");
-            System.out.println(t.toJson());
         }
         catch(IOException e) {
             System.err.println("IOException: " + e.getMessage());

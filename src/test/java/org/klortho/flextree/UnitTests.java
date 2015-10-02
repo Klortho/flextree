@@ -112,7 +112,6 @@ public class UnitTests extends TestCase {
             
             for (TreeTestCase testCase : testCases.cases) {
                 if (selected_tests != null && !selected_tests.contains(testCase.name)) {
-                    //System.out.println("Skipping " + testCase.name + " because you told me to");
                     continue;
                 }
                 if (testCase.skip) {
@@ -120,19 +119,23 @@ public class UnitTests extends TestCase {
                     continue;
                 }
               
+                System.out.println("Running test " + testCase.name);
+
                 StringPrintStream out = new StringPrintStream();
                 out.ps.print("Test " + testCase.name + ": ");
 
                 Tree tree = testCase.getTreeData();
-                //tree.print();
+                assertNotNull("test tree is null", tree);
+
                 LayoutEngine engine = testCase.getLayoutEngine();
-                if (engine == null) continue;
+                assertNotNull("layout engine is null", engine);
                 
-                System.out.println("Running test " + testCase.name);
                 engine.layout(tree);
                 checkOverlap(tree, out);
 
                 Tree expected = testCase.getExpected(); 
+                assertNotNull("expected tree is null", expected);
+                
                 boolean success = tree.deepEquals(expected, out.ps);
                 if (!success) {
                     PrintStream after = new PrintStream("after.json");

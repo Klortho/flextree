@@ -2,6 +2,7 @@ package org.klortho.flextree;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import org.klortho.flextree.LayoutEngine.TreeRelation;
@@ -52,8 +53,7 @@ public class TreeTestCases {
             return name + ".expected.json";
         }
         public Tree getExpected() throws IOException {
-            return Tree.fromJson(
-                getFile(testCaseDir + "/" + getExpectedName()));
+            return Tree.fromJson(getFile(testCaseDir + "/" + getExpectedName()));
         }
         
         public LayoutEngine getLayoutEngine() {
@@ -95,7 +95,6 @@ public class TreeTestCases {
             else if (gap.equals("separation-1")) {
                 b.setSeparation(new TreeRelation() {
                     public double s(Tree a, Tree b) {
-                        //System.out.println("In separation-1");
                         return 1;
                     }
                 });
@@ -112,7 +111,6 @@ public class TreeTestCases {
         cases = json_mapper.readValue(
                 getFile(testCaseDir + "/tests.json"),
                 new TypeReference<List<TreeTestCase>>() { } );
-        //System.out.println(json_mapper.writeValueAsString(cases));
     }
 
     public TreeTestCase getTestCase(String name) {
@@ -121,7 +119,9 @@ public class TreeTestCases {
         }
         return null;
     }
-    public static File getFile(String name) {
-        return new File(classLoader.getResource(name).getFile());
+    public static File getFile(String name) throws IOException {
+        URL url = classLoader.getResource(name);
+        if (url == null) throw new IOException("file not found: " + name);
+        return new File(url.getFile());
     }
 }

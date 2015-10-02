@@ -52,6 +52,8 @@ public class RenderMain {
                             return testCase.getTreeData();
                         }
                         catch (IOException e) {
+                            System.err.println("Error reading test case tree: " +
+                                e.getMessage());                            
                             return null;
                         }
                     }
@@ -80,8 +82,6 @@ public class RenderMain {
             t = treeGenerator.makeTree();
             if (doLayout) {
                 System.out.println("Doing layout");
-                LayoutEngine engine;
-                
                 if (testCase == null) {
                     engine = LayoutEngine.builder()
                             .setSetNodeSizes(true)

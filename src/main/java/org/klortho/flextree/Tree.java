@@ -15,10 +15,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @JsonIgnoreProperties({ "boundingBox", "minX", "depth", "parent" })
-@JsonPropertyOrder({ "x", "y", "x_size", "y_size", "children" })
+@JsonPropertyOrder({ "x", "y", "x_size", "y_size", "children", "name" })
 public final class Tree {
-    
     public Vector<Tree> children;
+    
+    // FIXME: if we were ever going to really make this a library, then Tree would
+    // be an interface or a base class, and wouldn't include `name`
+    public String name;
     
     // Set by the layout engine:
     public Tree parent;
