@@ -1,10 +1,18 @@
-Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
+Code accompanying the paper [Drawing Non-layered Tidy Trees in Linear 
+Time](http://oai.cwi.nl/oai/asset/21856/21856B.pdf).
+
+This was adapted into the [D3 flextree plugin](https://github.com/Klortho/d3-flextree).
+
+Thanks go to A.J. van der Ploeg, for making his code available on GitHub!
+
+
+
 
 # Compiling and running
 
 * Clone this repository, and also Klortho/d3-flextree.
 * Create a softlink from this repo's src/test/resources/test-cases to
-  d3-flextree's test-cases directory.
+  d3-flextree's test/cases directory.
 * Download and install Eclipse.
 * Download the SWT binaries from [here](https://www.eclipse.org/swt/), 
   for whatever platform you are on.
@@ -13,10 +21,11 @@ Code accompanying the paper "Drawing Non-layered Tidy Trees in Linear Time"
 * Clone this repository, then, in Eclipse, File -> Import -> "Existing project into
   workspace", then select this repository's root directory. Make sure you de-select
   "Copy projects into workspace".
-* Then, you should be able to right-click on Flextree.java (under src/main/java),
-  and select Run as -> Java application.
 
+Then, you have the following executables and tests, all of which are under
+src/test/java:
 
-# To do
-
-Moved to my [notes page](http://chrismaloney.org/notes/dtd-diagram).
+* RenderMain - renders a tree in SWT. See the comments in that file for command-line
+  arguments
+* PerformanceCheck
+* UnitTests - JUnit tests
