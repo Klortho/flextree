@@ -58,10 +58,21 @@ public class TreeElement extends Composite implements SelectionListener, PaintLi
 	
 	
 	public void reinit(){
-//		tree = new TreeNode(10, 10, new TreeNode(10,10,new TreeNode(10,10,new TreeNode(10,10),new TreeNode(10,10))), new TreeNode(10,10,new TreeNode(10,10), new TreeNode(10,10,new TreeNode(10,10))));
+		tree = new TreeNode(10, 10,
+		        new TreeNode(10, 10),
+                new TreeNode(10, 10,
+                  new TreeNode(20, 10),
+                  new TreeNode(20, 10),
+                  new TreeNode(10, 10),
+                  new TreeNode(10, 10),
+                  new TreeNode(10, 10)
+                ),
+                new TreeNode(10, 10)
+              );
+
 
 		//do {
-		tree = gen.rand();
+		//tree = gen.rand();
 		tree.addGap(10,10);
 		doLayout();
 		//}while(!overlap());
